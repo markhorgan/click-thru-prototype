@@ -1,0 +1,57 @@
+{
+  "name": "Click-Thru Prototype",
+  "description": "Exports artboards as images inside HTML pages with clickable hotspots",
+  "author" : "Mark Horgan",
+  "identifier" : "com.markhorgan.sketch.clickThruPrototype",
+  "compatibleVersion": 3,
+  "version" : "1.0",
+  "commands" : [
+    {
+      "script" : "artboard_link.js",
+      "handler" : "onRun",
+      "name" : "Link to Artboard",
+      "identifier" : "artboardLink"
+    },
+    {
+      "script" : "external_link.js",
+      "handler" : "onRun",
+      "name" : "Add External Link",
+      "identifier" : "externalLink"
+    },
+    {
+      "script": "java_script_dialog.js",
+      "handler": "onRun",
+      "name": "Add JavaScript Dialog",
+      "identifier": "javaScriptDialog"
+    },
+    {
+      "script" : "export_to_html.js",
+      "handler" : "onRun",
+      "name" : "Export to HTML",
+      "identifier" : "exportToHTML"
+    },
+    {
+      "script" : "mobile_menu.js",
+      "handler" : "mobileMenuButton",
+      "name" : "Set Mobile Menu Button",
+      "identifier" : "mobileMenuButton"
+    },
+    {
+      "script" : "mobile_menu.js",
+      "handler" : "mobileMenu",
+      "name" : "Set Mobile Menu",
+      "identifier" : "mobileMenu"
+    }
+  ],
+  "menu": {
+    "title": "Click-Thru Prototype",
+    "items": [
+      "artboardLink",
+      "externalLink",
+      "javaScriptDialog",
+      "mobileMenuButton",
+      "mobileMenu",
+      "exportToHTML"
+    ]
+  }
+}
