@@ -1,6 +1,6 @@
 # Click-Thru Prototype
 
-A Sketch plugin that creates a HTML click-through prototype of a responsive website design so you can give your clients an idea what the website will look like.
+A Sketch plugin that creates a HTML click-through prototype of a website design so you can give your clients an idea what the website will look like.
 
 ## Installation
 
