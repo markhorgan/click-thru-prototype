@@ -4,7 +4,7 @@ A Sketch plugin that creates a HTML click-through prototype of a responsive webs
 
 ## Installation
 
-To install, download the zip file and double-click on `Click-Thru Prototype.sketchplugin`. The commands will show up under `Plugins > Click-Thru Prototype`. To see it in action, open `demo.sketch` in the zip file and then select `Plugins > Click-Thru Prototype > Export to HTML`.
+To install, [download the zip file](https://github.com/markhorgan/click-thru-prototype/archive/master.zip) and double-click on `Click-Thru Prototype.sketchplugin`. The commands will show up under `Plugins > Click-Thru Prototype`. To see it in action, open `demo.sketch` in the zip file and then select `Plugins > Click-Thru Prototype > Export to HTML`.
 
 ## Usage
 
