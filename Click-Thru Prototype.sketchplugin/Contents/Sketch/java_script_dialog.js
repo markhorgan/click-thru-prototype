@@ -38,7 +38,6 @@ const onRun = function(context) {
 
   const dialogText = String(Utils.valueForKeyOnLayers(Constants.DIALOG_TEXT, selection, context, ""))
   var dialogType = String(Utils.valueForKeyOnLayers(Constants.DIALOG_TYPE, selection, context))
-  log("1: dialogText:"+dialogText+",dialogType:"+dialogType)
 
   var dialogTypeIndex = 0
   if (dialogText != "") {

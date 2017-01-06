@@ -323,10 +323,9 @@ Exporter.prototype.exportImages = function(artboardSet) {
       const slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(mobileMenuLayer, mobileMenuLayer.absoluteInfluenceRect(), false).firstObject()
       slice.format = "png"
       doc.saveArtboardOrSlice_toFile(slice, imagesPath + this.getMobileMenuImageName(artboardData.artboard))
-    }
-
-    if (mobileMenuLayerIsVisible) {
-      mobileMenuLayer.setIsVisible(true)
+      if (!mobileMenuLayerIsVisible) {
+        mobileMenuLayer.setIsVisible(false)
+      }
     }
   }, this)
 }
