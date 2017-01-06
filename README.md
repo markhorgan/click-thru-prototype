@@ -8,7 +8,7 @@ To install, [download the zip file](https://github.com/markhorgan/click-thru-pro
 
 ## Usage
 
-You can create links between artboards, add external links or show a JavaScript dialog. When you're finished adding these you can generate a HTML website which you can upload to a server to show to your client by selecting `Export to HTML`. 
+You can create links between artboards, add external links or show a JavaScript dialog. When you're finished adding these you can generate a HTML website of the current page by selecting `Export to HTML`. The generated files can then be uploaded to a server so you can show your client. 
  
 The plugin can handle responsive design, you just need to start your artboards with the same name e.g. `homepage`, `homepage tablet`, `homepage mobile`. When you change the width of your browser it will show a different artboard in the exported website. 
  

@@ -97,14 +97,14 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
     }, this)
   }
 
-  var x = layer.absoluteRect().rulerX() - Constants.HOTSPOT_PADDING
-  var y = layer.absoluteRect().rulerY() - Constants.HOTSPOT_PADDING
+  var x = Math.round(layer.absoluteRect().rulerX() - Constants.HOTSPOT_PADDING)
+  var y = Math.round(layer.absoluteRect().rulerY() - Constants.HOTSPOT_PADDING)
   if (offset != null) {
     x += offset.x
     y += offset.y
   }
-  const width = layer.frame().width()
-  const height = layer.frame().height()
+  const width = Math.round(layer.absoluteRect().width())
+  const height = Math.round(layer.absoluteRect().height())
 
   var artboardName = command.valueForKey_onLayer_forPluginIdentifier(Constants.ARTBOARD_LINK, layer, this.context.plugin.identifier())
   if (artboardName != null && artboardName != "") {
@@ -156,9 +156,11 @@ Exporter.prototype.buildHotspots = function(layer, artboardData, indent) {
   const isMobileMenuLayer = !layer.isKindOfClass(MSArtboardGroup)
   const offset = isMobileMenuLayer ? {x:-layer.absoluteRect().rulerX(), y:-layer.absoluteRect().rulerY()} : null
   const hotspots = this.getHotspots(layer, !isMobileMenuLayer, offset, artboardData)
-  hotspots.forEach(function(hotspot) {
-    html += Utils.tab(indent) + this.buildHotspotHTML(hotspot)
-  }, this)
+  if (hotspots != null) {
+    hotspots.forEach(function (hotspot) {
+      html += Utils.tab(indent) + this.buildHotspotHTML(hotspot)
+    }, this)
+  }
   return html
 }
 
