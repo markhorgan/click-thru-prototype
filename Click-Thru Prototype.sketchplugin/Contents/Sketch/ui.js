@@ -1,7 +1,7 @@
-const UI = {}
+var UI = {}
 
 UI.buildLabel = function(text, fontSize, frame) {
-  const label = NSTextField.alloc().initWithFrame(frame)
+  var label = NSTextField.alloc().initWithFrame(frame)
   label.setStringValue(text)
   label.setFont(NSFont.boldSystemFontOfSize(fontSize))
   label.setBezeled(false)
@@ -13,7 +13,7 @@ UI.buildLabel = function(text, fontSize, frame) {
 
 // placeholder: optional
 UI.buildTextField = function(text, frame, placeholder) {
-  const textField = NSTextField.alloc().initWithFrame(frame)
+  var textField = NSTextField.alloc().initWithFrame(frame)
   textField.setEditable(true)
   textField.setBordered(true)
   textField.setStringValue(text)
@@ -25,7 +25,7 @@ UI.buildTextField = function(text, frame, placeholder) {
 
 UI.buildCheckbox = function(text, checked, frame) {
   checked = (checked == false) ? NSOffState : NSOnState
-  const checkbox = NSButton.alloc().initWithFrame(frame)
+  var checkbox = NSButton.alloc().initWithFrame(frame)
   checkbox.setButtonType(NSSwitchButton)
   checkbox.setBezelStyle(0)
   checkbox.setTitle(text)
@@ -38,18 +38,18 @@ UI.buildRadioButtons = function(labels, selectedIndex, frame, isHorizontal) {
   if (isHorizontal == null) {
     isHorizontal = true
   }
-  const buttonCell = NSButtonCell.new()
+  var buttonCell = NSButtonCell.new()
   buttonCell.setButtonType(NSRadioButton)
   if (isHorizontal) {
-    const numRows = 1
-    const numCols = labels.length
+    var numRows = 1
+    var numCols = labels.length
   } else {
-    const numRows = labels.length
-    const numCols = 1
+    var numRows = labels.length
+    var numCols = 1
   }
-  const matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(frame, NSRadioModeMatrix, buttonCell, numRows, numCols)
+  var matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(frame, NSRadioModeMatrix, buttonCell, numRows, numCols)
   matrix.setAutorecalculatesCellSize(true)
-  const cells = matrix.cells()
+  var cells = matrix.cells()
   for (var i = 0; i < labels.length; i++) {
     cells[i].setTitle(labels[i])
   }
@@ -65,7 +65,7 @@ UI.buildRadioButtons = function(labels, selectedIndex, frame, isHorizontal) {
 
 // selectedIndex: optional
 UI.buildComboBox = function(frame, values, selectedIndex) {
-  const comboBox = NSComboBox.alloc().initWithFrame(frame)
+  var comboBox = NSComboBox.alloc().initWithFrame(frame)
   comboBox.addItemsWithObjectValues(values)
   if (selectedIndex != null) {
     comboBox.selectItemAtIndex(selectedIndex)

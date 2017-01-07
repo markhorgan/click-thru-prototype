@@ -1,7 +1,7 @@
 @import "constants.js"
 @import "utils.js"
 
-const Exporter = function(outputPath, page, context) {
+var Exporter = function(outputPath, page, context) {
   this.page = page
   this.pagePath = outputPath + "/" + Utils.toFilename(this.page.name())
   this.context = context
@@ -16,8 +16,8 @@ Exporter.prototype.hasMobileMenu = function(){
 }
 
 Exporter.prototype.generateCSSFile = function() {
-  const fileManager = NSFileManager.defaultManager()
-  const path = this.pagePath + "/css"
+  var fileManager = NSFileManager.defaultManager()
+  var path = this.pagePath + "/css"
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
@@ -37,8 +37,8 @@ Exporter.prototype.generateCSSFile = function() {
 }
 
 Exporter.prototype.generateJSFile = function(){
-  const fileManager = NSFileManager.defaultManager()
-  const path = this.pagePath + "/js"
+  var fileManager = NSFileManager.defaultManager()
+  var path = this.pagePath + "/js"
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
@@ -68,12 +68,12 @@ Exporter.prototype.getArtboardName = function(artboardName) {
 }
 
 Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artboardData) {
-  const command = this.context.command
+  var command = this.context.command
   if (!layer.isVisible() || (excludeMobileMenu && command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU, layer, this.context.plugin.identifier()))) {
     return
   }
 
-  const hotspots = new Array()
+  var hotspots = new Array()
 
   if (layer.isKindOfClass(MSSymbolInstance)) {
     // symbol
@@ -83,14 +83,14 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
     } else {
       symbolOffset = {x:layer.absoluteRect().rulerX(), y:layer.absoluteRect().rulerY()}
     }
-    const childHotspots = this.getHotspots(layer.symbolMaster(), excludeMobileMenu, symbolOffset, artboardData)
+    var childHotspots = this.getHotspots(layer.symbolMaster(), excludeMobileMenu, symbolOffset, artboardData)
     if (childHotspots != null) {
       Array.prototype.push.apply(hotspots, childHotspots)
     }
   } else if (layer.isKindOfClass(MSLayerGroup)) {
     // layer group
     layer.layers().forEach(function(childLayer){
-      const childHotspots = this.getHotspots(childLayer, excludeMobileMenu, offset, artboardData)
+      var childHotspots = this.getHotspots(childLayer, excludeMobileMenu, offset, artboardData)
       if (childHotspots != null) {
         Array.prototype.push.apply(hotspots, childHotspots)
       }
@@ -103,8 +103,8 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
     x += offset.x
     y += offset.y
   }
-  const width = Math.round(layer.absoluteRect().width())
-  const height = Math.round(layer.absoluteRect().height())
+  var width = Math.round(layer.absoluteRect().width())
+  var height = Math.round(layer.absoluteRect().height())
 
   var artboardName = command.valueForKey_onLayer_forPluginIdentifier(Constants.ARTBOARD_LINK, layer, this.context.plugin.identifier())
   if (artboardName != null && artboardName != "") {
@@ -115,24 +115,24 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
     var externalLink = command.valueForKey_onLayer_forPluginIdentifier(Constants.EXTERNAL_LINK, layer, this.context.plugin.identifier())
     if (externalLink != null && externalLink != "") {
       var openLinkInNewWindow = command.valueForKey_onLayer_forPluginIdentifier(Constants.OPEN_LINK_IN_NEW_WINDOW, layer, this.context.plugin.identifier())
-      const regExp = new RegExp("^http(s?):\/\/")
+      var regExp = new RegExp("^http(s?):\/\/")
       if (!regExp.test(externalLink.toLowerCase())) {
         externalLink = "http://" + externalLink
       }
-      const target = openLinkInNewWindow ? "_blank" : null
+      var target = openLinkInNewWindow ? "_blank" : null
       hotspots.push({href:externalLink, target:target, x: x, y: y, width: width, height: height})
     } else {
-      const dialogType = command.valueForKey_onLayer_forPluginIdentifier(Constants.DIALOG_TYPE, layer, this.context.plugin.identifier())
+      var dialogType = command.valueForKey_onLayer_forPluginIdentifier(Constants.DIALOG_TYPE, layer, this.context.plugin.identifier())
       if (dialogType != null) {
         // JavaScript dialog
         var dialogText = command.valueForKey_onLayer_forPluginIdentifier(Constants.DIALOG_TEXT, layer, this.context.plugin.identifier())
         dialogText = dialogText.replace(new RegExp("'", "g"), "\\'").replace(new RegExp('"', "g"), "")
         hotspots.push({href: "javascript:" + dialogType + "('" + dialogText + "')", x: x, y: y, width: width, height: height})
       } else {
-        const isMobileMenuButton = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU_BUTTON, layer, this.context.plugin.identifier())
+        var isMobileMenuButton = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU_BUTTON, layer, this.context.plugin.identifier())
         if (isMobileMenuButton) {
           // mobile menu button
-          const idName = this.getCSSName(artboardData, "mobile-menu-container")
+          var idName = this.getCSSName(artboardData, "mobile-menu-container")
           hotspots.push({href: "javascript:$(\'#" + idName + "\').toggle()", x: x, y: y, width: width, height: height})
         }
       }
@@ -142,7 +142,7 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
 }
 
 Exporter.prototype.buildHotspotHTML = function(hotspot) {
-  const style = "left:" + hotspot.x + "px;top:" + hotspot.y + "px;width:" + hotspot.width + "px;height:" + hotspot.height + "px"
+  var style = "left:" + hotspot.x + "px;top:" + hotspot.y + "px;width:" + hotspot.width + "px;height:" + hotspot.height + "px"
   var html = '<a href="' + hotspot.href + '" class="hotspot" style="' + style + '"'
   if (hotspot.target != null) {
     html += ' target="' + hotspot.target + '"'
@@ -153,9 +153,9 @@ Exporter.prototype.buildHotspotHTML = function(hotspot) {
 
 Exporter.prototype.buildHotspots = function(layer, artboardData, indent) {
   var html = ''
-  const isMobileMenuLayer = !layer.isKindOfClass(MSArtboardGroup)
-  const offset = isMobileMenuLayer ? {x:-layer.absoluteRect().rulerX(), y:-layer.absoluteRect().rulerY()} : null
-  const hotspots = this.getHotspots(layer, !isMobileMenuLayer, offset, artboardData)
+  var isMobileMenuLayer = !layer.isKindOfClass(MSArtboardGroup)
+  var offset = isMobileMenuLayer ? {x:-layer.absoluteRect().rulerX(), y:-layer.absoluteRect().rulerY()} : null
+  var hotspots = this.getHotspots(layer, !isMobileMenuLayer, offset, artboardData)
   if (hotspots != null) {
     hotspots.forEach(function (hotspot) {
       html += Utils.tab(indent) + this.buildHotspotHTML(hotspot)
@@ -174,14 +174,14 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
     }
     html += ' }\n'
     if (artboardData.mobileMenuLayer != null) {
-      const mobileMenuLayer = artboardData.mobileMenuLayer
-      const left = mobileMenuLayer.absoluteRect().rulerX() + (Math.floor((mobileMenuLayer.frame().width() - mobileMenuLayer.absoluteInfluenceRect().size.width) / 2))
-      const top = mobileMenuLayer.absoluteRect().rulerY() + (Math.floor((mobileMenuLayer.frame().height() - mobileMenuLayer.absoluteInfluenceRect().size.height) / 2))
+      var mobileMenuLayer = artboardData.mobileMenuLayer
+      var left = mobileMenuLayer.absoluteRect().rulerX() + (Math.floor((mobileMenuLayer.frame().width() - mobileMenuLayer.absoluteInfluenceRect().size.width) / 2))
+      var top = mobileMenuLayer.absoluteRect().rulerY() + (Math.floor((mobileMenuLayer.frame().height() - mobileMenuLayer.absoluteInfluenceRect().size.height) / 2))
       html += '#' + this.getCSSName(artboardData, "mobile-menu-container") + ' { left:' + left + 'px; top:' + top + 'px }\n'
     }
     if (index == 0) {
       if (artboardData.artboard.hasBackgroundColor()) {
-        const backgroundColor = Utils.colorToHex(artboardData.artboard.backgroundColor())
+        var backgroundColor = Utils.colorToHex(artboardData.artboard.backgroundColor())
         html += 'body { background-color: ' + backgroundColor + ' }\n'
       }
     }
@@ -190,7 +190,7 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
   artboardSet.forEach(function(artboardData, index){
     if (index > 0) {
       // media query
-      const previousArtboardData = artboardSet[index - 1]
+      var previousArtboardData = artboardSet[index - 1]
       html += '@media screen and (max-width: ' + (previousArtboardData.artboard.frame().width() - 1) + 'px) {\n'
       // hide other artboards
       html += '  '
@@ -206,7 +206,7 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
       // show artboard
       html += '  #' + this.getCSSName(artboardData, "artboard-container") + ' { display: block }\n'
       if (artboardData.artboard.hasBackgroundColor()) {
-        const backgroundColor = Utils.colorToHex(artboardData.artboard.backgroundColor())
+        var backgroundColor = Utils.colorToHex(artboardData.artboard.backgroundColor())
         html += '  body { background-color: ' + backgroundColor + ' }\n'
       }
       html += '}\n'
@@ -231,10 +231,10 @@ Exporter.prototype.getCSSName = function(artboardData, suffix) {
 
 // nestedHTML: optional
 Exporter.prototype.buildArtboardHTML = function(artboardData, nestedHTML) {
-  const artboard = artboardData.artboard
-  const width = artboard.frame().width()
-  const height = artboard.frame().height()
-  const className = this.getCSSName(artboardData, "artboard")
+  var artboard = artboardData.artboard
+  var width = artboard.frame().width()
+  var height = artboard.frame().height()
+  var className = this.getCSSName(artboardData, "artboard")
   var html = Utils.tab(1) + '<div id="'+className+'-container" class="artboard-container">\n' +
     Utils.tab(2) + '<img src="images/'+this.getArtboardImageName(artboard)+'" width="'+width+'" height="'+height+'" class="artboard-image"/>\n' +
     this.buildHotspots(artboard, artboardData, 2)
@@ -246,13 +246,13 @@ Exporter.prototype.buildArtboardHTML = function(artboardData, nestedHTML) {
 }
 
 Exporter.prototype.buildMobileMenuHTML = function(artboardData, indent) {
-  const mobileMenuLayer = artboardData.mobileMenuLayer
+  var mobileMenuLayer = artboardData.mobileMenuLayer
   if (mobileMenuLayer == null) {
     return null
   }
-  const width = mobileMenuLayer.absoluteInfluenceRect().size.width
-  const height = mobileMenuLayer.absoluteInfluenceRect().size.height
-  const idName = this.getCSSName(artboardData, "mobile-menu-container")
+  var width = mobileMenuLayer.absoluteInfluenceRect().size.width
+  var height = mobileMenuLayer.absoluteInfluenceRect().size.height
+  var idName = this.getCSSName(artboardData, "mobile-menu-container")
   return  Utils.tab(indent) + '<div id="'+idName+'" class="mobile-menu-container">\n' +
     Utils.tab(indent + 1) + '<img src="images/'+this.getMobileMenuImageName(artboardData.artboard)+'" width="'+width+'" height="'+height+'" class="mobile-menu-image"/>\n' +
     this.buildHotspots(mobileMenuLayer, artboardData, indent + 1) +
@@ -266,7 +266,7 @@ Exporter.prototype.hasMobileMenuLayer = function(artboardSet) {
 }
 
 Exporter.prototype.generateHTMLFile = function(artboardSet) {
-  const mainArtboard = artboardSet[0].artboard
+  var mainArtboard = artboardSet[0].artboard
   var html = '<!DOCTYPE html>\n<head>\n' +
     '<title>'+mainArtboard.name()+'</title>\n' +
     '<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />\n' +
@@ -290,7 +290,7 @@ Exporter.prototype.generateHTMLFile = function(artboardSet) {
 }
 
 Exporter.prototype.findLayer = function(key, layer) {
-  const isMobileMenu = !!(this.context.command.valueForKey_onLayer_forPluginIdentifier(key, layer, this.context.plugin.identifier()))
+  var isMobileMenu = !!(this.context.command.valueForKey_onLayer_forPluginIdentifier(key, layer, this.context.plugin.identifier()))
   if (isMobileMenu) {
     return layer
   }
@@ -309,10 +309,10 @@ Exporter.prototype.findLayer = function(key, layer) {
 }
 
 Exporter.prototype.exportImages = function(artboardSet) {
-  const doc = this.context.document
-  const imagesPath = this.pagePath + "/images/"
+  var doc = this.context.document
+  var imagesPath = this.pagePath + "/images/"
   artboardSet.forEach(function(artboardData){
-    const mobileMenuLayer = artboardData.mobileMenuLayer
+    var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
     if (mobileMenuLayerIsVisible) {
       mobileMenuLayer.setIsVisible(false)
@@ -322,7 +322,7 @@ Exporter.prototype.exportImages = function(artboardSet) {
 
     if (mobileMenuLayer != null) {
       mobileMenuLayer.setIsVisible(true)
-      const slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(mobileMenuLayer, mobileMenuLayer.absoluteInfluenceRect(), false).firstObject()
+      var slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(mobileMenuLayer, mobileMenuLayer.absoluteInfluenceRect(), false).firstObject()
       slice.format = "png"
       doc.saveArtboardOrSlice_toFile(slice, imagesPath + this.getMobileMenuImageName(artboardData.artboard))
       if (!mobileMenuLayerIsVisible) {
@@ -334,7 +334,7 @@ Exporter.prototype.exportImages = function(artboardSet) {
 
 Exporter.prototype.getArtboardSet = function(artboard, artboardSets) {
   for (var i = 0; i < artboardSets.length; i++) {
-    const artboardSet = artboardSets[i]
+    var artboardSet = artboardSets[i]
     var suffix = Utils.getSuffix(artboard.name(), artboardSet[0].artboard.name())
     if (suffix != null) {
       if (suffix.length == 0) {
@@ -350,7 +350,7 @@ Exporter.prototype.getArtboardSets = function(){
   var artboardSets = new Array()
 
   // sort by name
-  const artboards = this.page.artboards().sort(function(a, b) {
+  var artboards = this.page.artboards().sort(function(a, b) {
     if (a.name() < b.name()) {
       return -1
     } else if (a.name() > b.name()) {
@@ -393,8 +393,8 @@ Exporter.prototype.getArtboardSets = function(){
 }
 
 Exporter.prototype.exportArtboards = function () {
-  const fileManager = NSFileManager.defaultManager()
-  const doc = this.context.document
+  var fileManager = NSFileManager.defaultManager()
+  var doc = this.context.document
 
   // delete and create directory
   if (fileManager.fileExistsAtPath(this.pagePath)) {

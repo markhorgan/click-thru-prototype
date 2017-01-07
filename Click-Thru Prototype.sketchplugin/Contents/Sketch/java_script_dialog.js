@@ -2,41 +2,41 @@
 @import "utils.js"
 @import "ui.js"
 
-const buildAlertWindow = function(typeIndex, text) {
-  const alertWindow = COSAlertWindow.new()
+var buildAlertWindow = function(typeIndex, text) {
+  var alertWindow = COSAlertWindow.new()
   alertWindow.addButtonWithTitle("Add")
   alertWindow.addButtonWithTitle("Remove")
   alertWindow.addButtonWithTitle("Cancel")
   alertWindow.setMessageText("JavaScript Dialog")
   alertWindow.setInformativeText("Shows a JavaScript dialog when you click on the selected layers.")
 
-  const dialogTypeView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 42))
-  const dialogTypeLabel = UI.buildLabel("Dialog Type", 12, NSMakeRect(0, 22, 300, 20))
+  var dialogTypeView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 42))
+  var dialogTypeLabel = UI.buildLabel("Dialog Type", 12, NSMakeRect(0, 22, 300, 20))
   dialogTypeView.addSubview(dialogTypeLabel)
-  const radioButtons = UI.buildRadioButtons(["Alert", "Confirm"], typeIndex, NSMakeRect(0, 0, 300, 20))
+  var radioButtons = UI.buildRadioButtons(["Alert", "Confirm"], typeIndex, NSMakeRect(0, 0, 300, 20))
   dialogTypeView.addSubview(radioButtons)
   alertWindow.addAccessoryView(dialogTypeView)
 
-  const textView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 47))
-  const textLabel = UI.buildLabel("Dialog Text", 12, NSMakeRect(0, 22, 300, 20))
+  var textView = NSView.alloc().initWithFrame(NSMakeRect(0, 0, 300, 47))
+  var textLabel = UI.buildLabel("Dialog Text", 12, NSMakeRect(0, 22, 300, 20))
   textView.addSubview(textLabel)
-  const textField = UI.buildTextField(text, NSMakeRect(0, 0, 300, 20))
+  var textField = UI.buildTextField(text, NSMakeRect(0, 0, 300, 20))
   textView.addSubview(textField)
   alertWindow.addAccessoryView(textView)
 
   return [alertWindow, [radioButtons, textField]]
 }
 
-const onRun = function(context) {
-  const doc = context.document
-  const selection = context.selection
+var onRun = function(context) {
+  var doc = context.document
+  var selection = context.selection
 
   if (selection.length == 0) {
     doc.showMessage("Select a one or more layers")
     return
   }
 
-  const dialogText = String(Utils.valueForKeyOnLayers(Constants.DIALOG_TEXT, selection, context, ""))
+  var dialogText = String(Utils.valueForKeyOnLayers(Constants.DIALOG_TEXT, selection, context, ""))
   var dialogType = String(Utils.valueForKeyOnLayers(Constants.DIALOG_TYPE, selection, context))
 
   var dialogTypeIndex = 0
@@ -51,10 +51,10 @@ const onRun = function(context) {
         break
     }
   }
-  const retVals = buildAlertWindow(dialogTypeIndex, dialogText), alertWindow = retVals[0], inputControls = retVals[1]
-  const response = alertWindow.runModal()
+  var retVals = buildAlertWindow(dialogTypeIndex, dialogText), alertWindow = retVals[0], inputControls = retVals[1]
+  var response = alertWindow.runModal()
   if (response != 1002) {
-    const dialogText = inputControls[1].stringValue()
+    var dialogText = inputControls[1].stringValue()
     if (dialogText == "" || response == 1001) {
       // remove
       Utils.setValueOnLayers(null, Constants.DIALOG_TYPE, selection, context)

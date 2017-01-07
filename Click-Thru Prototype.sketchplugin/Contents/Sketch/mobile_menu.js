@@ -2,8 +2,8 @@
 @import "constants.js"
 @import "utils.js"
 
-const buildAlertWindow = function(title, informationText, isOn) {
-  const alertWindow = COSAlertWindow.new()
+var buildAlertWindow = function(title, informationText, isOn) {
+  var alertWindow = COSAlertWindow.new()
   alertWindow.addButtonWithTitle("Add")
   alertWindow.addButtonWithTitle("Remove")
   alertWindow.addButtonWithTitle("Cancel")
@@ -12,9 +12,9 @@ const buildAlertWindow = function(title, informationText, isOn) {
   return alertWindow
 }
 
-const setBooleanValueOnLayers = function(key, title, informationText, context) {
-  const doc = context.document
-  const selection = context.selection
+var setBooleanValueOnLayers = function(key, title, informationText, context) {
+  var doc = context.document
+  var selection = context.selection
 
   if (selection.length == 0) {
     doc.showMessage("Select a one or more layers")
@@ -23,8 +23,8 @@ const setBooleanValueOnLayers = function(key, title, informationText, context) {
 
   var isOn = Utils.valueForKeyOnLayers(key, selection, context, 1)
   isOn = isOn == 1
-  const alertWindow = buildAlertWindow(title, informationText, isOn)
-  const response = alertWindow.runModal()
+  var alertWindow = buildAlertWindow(title, informationText, isOn)
+  var response = alertWindow.runModal()
   switch (response) {
     case 1000:
       Utils.setValueOnLayers(true, key, selection, context, true, true)
@@ -36,11 +36,11 @@ const setBooleanValueOnLayers = function(key, title, informationText, context) {
   }
 }
 
-const mobileMenu = function(context) {
+var mobileMenu = function(context) {
   setBooleanValueOnLayers(Constants.IS_MOBILE_MENU, "Mobile Menu", "The mobile menu that is shown when the mobile menu button is clicked.", context)
 }
 
-const mobileMenuButton = function(context) {
+var mobileMenuButton = function(context) {
   setBooleanValueOnLayers(Constants.IS_MOBILE_MENU_BUTTON, "Mobile Menu Button", "The button that shows the mobile menu.", context)
 }
 

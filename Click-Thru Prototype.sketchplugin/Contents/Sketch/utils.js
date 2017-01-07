@@ -1,6 +1,6 @@
 @import "constants.js"
 
-const Utils = {}
+var Utils = {}
 
 Utils.writeToFile = function (str, filePath) {
   objcStr = [NSString stringWithFormat:@"%@", str]
@@ -16,7 +16,7 @@ Utils.colorToHex = function (color) {
 }
 
 Utils.saveFileDialog = function() {
-  const openPanel = NSOpenPanel.openPanel()
+  var openPanel = NSOpenPanel.openPanel()
   openPanel.setTitle("Chooce a location...")
   openPanel.setPrompt("Export")
   openPanel.setCanChooseDirectories(true)
@@ -25,7 +25,7 @@ Utils.saveFileDialog = function() {
   openPanel.setAllowsMultipleSelection(false)
   openPanel.setShowsHiddenFiles(false)
   openPanel.setExtensionHidden(false)
-  const buttonPressed = openPanel.runModal()
+  var buttonPressed = openPanel.runModal()
   if (buttonPressed == NSFileHandlingPanelOKButton) {
     return openPanel.URL()
   }
@@ -37,7 +37,7 @@ Utils.toFilename = function(name, dasherize) {
   if (dasherize == null) {
     dasherize = true
   }
-  const dividerCharacter = dasherize ? "-" : "_"
+  var dividerCharacter = dasherize ? "-" : "_"
   return name.replace(/[\/]/g, "").replace(/[\s_-]+/g, dividerCharacter).toLowerCase()
 }
 
@@ -59,7 +59,7 @@ Utils.valueForKeyOnLayers = function(key, selection, context, nullValue) {
   }
 }
 
-const _deleteFromArtboard = function(layer, ignoreLayer, key, context) {
+var _deleteFromArtboard = function(layer, ignoreLayer, key, context) {
   if (layer != ignoreLayer) {
     context.command.setValue_forKey_onLayer_forPluginIdentifier(null, key, layer, context.plugin.identifier())
   }
@@ -79,7 +79,7 @@ Utils.setValueOnLayers = function(value, key, selection, context, exclusiveOnLay
   if (exclusiveOnArtboard == null) {
     exclusiveOnArtboard = false
   }
-  const command = context.command
+  var command = context.command
   selection.forEach(function(layer){
     command.setValue_forKey_onLayer_forPluginIdentifier(value, key, layer, context.plugin.identifier())
 
@@ -123,8 +123,8 @@ Utils.getSuffix = function(str1, str2) {
   while (i <= str1.length && i <= str2.length && str1.substring(0, i) == str2.substring(0, i)) {
     i++
   }
-  const digitRegExp = /^\d+$/
-  const separatorRegExp = /[\s-_]+/
+  var digitRegExp = /^\d+$/
+  var separatorRegExp = /[\s-_]+/
   var suffix = str1.substr(i - 1).replace(/^[\s-_]+/, "").trim()
   if (i > 1 && !digitRegExp.test(suffix) && !separatorRegExp.test(suffix)) {
     //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix)
