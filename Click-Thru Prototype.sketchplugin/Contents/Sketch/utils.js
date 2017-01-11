@@ -112,8 +112,11 @@ Utils.repeatStr = function(count, str) {
   return retStr
 }
 
-Utils.tab = function(count) {
-  return Utils.repeatStr(count * Constants.TAB_SIZE)
+Utils.tab = function(count, tabSize) {
+  if (tabSize == null) {
+    tabSize = Constants.TAB_SIZE
+  }
+  return Utils.repeatStr(count * tabSize)
 }
 
 Utils.getSuffix = function(str1, str2) {

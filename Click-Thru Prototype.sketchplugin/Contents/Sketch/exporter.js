@@ -67,44 +67,118 @@ Exporter.prototype.getArtboardName = function(artboardName) {
   return retArtboardName
 }
 
-Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artboardData) {
+Exporter.prototype.getAbsoluteRect = function(layer, parentAbsoluteRect, indent) {
+  var x, y, returnRect
+  if (layer.isKindOfClass(MSArtboardGroup)) {
+    if (parentAbsoluteRect != null) {
+      // symbol artboard
+      returnRect = parentAbsoluteRect
+    } else {
+      // root artboard
+      returnRect = NSMakeRect(0, 0, layer.absoluteRect().width(), layer.absoluteRect().height())
+    }
+  } else if (parentAbsoluteRect != null) {
+    switch (layer.resizingType()) {
+      case ResizingType.STRETCH:
+        var parentLayer = layer.parentForInsertingLayers()
+        var horzScale = parentAbsoluteRect.size.width / parentLayer.frame().width()
+        var vertScale = parentAbsoluteRect.size.height / parentLayer.frame().height()
+        x = parentAbsoluteRect.origin.x + (layer.frame().x() * horzScale)
+        y = parentAbsoluteRect.origin.y + (layer.frame().y() * vertScale)
+        var width = layer.frame().width() * horzScale
+        var height = layer.frame().height() * vertScale
+        returnRect = NSMakeRect(x, y, width, height)
+        if (Constants.LAYER_LOGGING) {
+          log(Utils.tab(indent, 1) + layer.name() + ": " + layer.class() + "," + layer.isKindOfClass(MSArtboardGroup) + "," + layer.resizingType() + ",scale:" + horzScale + "," + vertScale + ",(" + Math.round(returnRect.origin.x) + "," + Math.round(returnRect.origin.y) + "," + Math.round(returnRect.size.width) + "," + Math.round(returnRect.size.height) + ")")
+        }
+        return returnRect
+
+      case ResizingType.PIN_TO_CORNER:
+        var parentLayer = layer.parentForInsertingLayers()
+        var leftDistance =  layer.frame().x()
+        var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
+        x = leftDistance < rightDistance ? parentAbsoluteRect.origin.x + leftDistance : (parentAbsoluteRect.origin.x +
+          parentAbsoluteRect.size.width) - rightDistance - layer.frame().width()
+        var topDistance = layer.frame().y()
+        var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
+        y = topDistance < bottomDistance ? parentAbsoluteRect.origin.y + topDistance : (parentAbsoluteRect.origin.y +
+          parentAbsoluteRect.size.height) - bottomDistance - layer.frame().height()
+        returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
+        break
+
+      case ResizingType.RESIZE_OBJECT:
+        var parentLayer = layer.parentForInsertingLayers()
+        var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
+        var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
+        returnRect = NSMakeRect(parentAbsoluteRect.origin.x + layer.frame().x(),  parentAbsoluteRect.origin.y + layer.frame().y(),
+          parentAbsoluteRect.size.width - layer.frame().x() - rightDistance, parentAbsoluteRect.size.height - layer.frame().y() - bottomDistance)
+        break
+
+      case ResizingType.FLOAT_IN_PLACE:
+        var parentLayer = layer.parentForInsertingLayers()
+
+        var unscaledLeftoverHorzSpace = parentLayer.frame().width() - layer.frame().width()
+        var leftSpaceFraction = layer.frame().x() / unscaledLeftoverHorzSpace
+        var rightSpaceFraction = (parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())) / unscaledLeftoverHorzSpace
+        var leftoverHorzSpace = parentAbsoluteRect.size.width - layer.frame().width()
+        x = (((leftSpaceFraction * leftoverHorzSpace) + (parentAbsoluteRect.size.width - (rightSpaceFraction * leftoverHorzSpace))) / 2) + parentAbsoluteRect.origin.x - (layer.frame().width() / 2)
+
+        var unscaledLeftoverVertSpace = parentLayer.frame().height() - layer.frame().height()
+        var topSpaceFraction = layer.frame().y() / unscaledLeftoverVertSpace
+        var bottomSpaceFraction = (parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())) / unscaledLeftoverVertSpace
+        var leftoverVertSpace = parentAbsoluteRect.size.height - layer.frame().height()
+        y = (((topSpaceFraction * leftoverVertSpace) + (parentAbsoluteRect.size.height - (bottomSpaceFraction * leftoverVertSpace))) / 2) +  parentAbsoluteRect.origin.y - (layer.frame().height() / 2)
+        returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
+        break
+    }
+  } else {
+    // mobile menu layer
+    returnRect = NSMakeRect(layer.absoluteRect().rulerX(), layer.absoluteRect().rulerY(), layer.absoluteRect().width(), layer.absoluteRect().height())
+  }
+  if (Constants.LAYER_LOGGING) {
+    log(Utils.tab(indent, 1) + layer.name() + ": " + layer.class() + "," + layer.isKindOfClass(MSArtboardGroup) + "," + layer.resizingType() + ",(" + Math.round(returnRect.origin.x) + "," + Math.round(returnRect.origin.y) + "," + Math.round(returnRect.size.width) + "," + Math.round(returnRect.size.height) + ")")
+  }
+  return returnRect
+}
+
+Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artboardData, parentAbsoluteRect, indent) {
   var command = this.context.command
-  if (!layer.isVisible() || (excludeMobileMenu && command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU, layer, this.context.plugin.identifier()))) {
+  var isMobileMenu = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU, layer, this.context.plugin.identifier())
+  if ((!layer.isVisible() && !isMobileMenu) || (excludeMobileMenu && isMobileMenu)) {
     return
   }
+  if (indent == null) {
+    indent = 0
+  }
+
+  var absoluteRect = this.getAbsoluteRect(layer, parentAbsoluteRect, indent)
 
   var hotspots = new Array()
-
   if (layer.isKindOfClass(MSSymbolInstance)) {
-    // symbol
-    var symbolOffset
-    if (offset != null) {
-      symbolOffset = {x:layer.absoluteRect().rulerX() + offset.x, y:layer.absoluteRect().rulerY() + offset.y}
-    } else {
-      symbolOffset = {x:layer.absoluteRect().rulerX(), y:layer.absoluteRect().rulerY()}
-    }
-    var childHotspots = this.getHotspots(layer.symbolMaster(), excludeMobileMenu, symbolOffset, artboardData)
+    // symbol instance
+    var childHotspots = this.getHotspots(layer.symbolMaster(), excludeMobileMenu, offset, artboardData, absoluteRect, indent + 1)
     if (childHotspots != null) {
       Array.prototype.push.apply(hotspots, childHotspots)
     }
   } else if (layer.isKindOfClass(MSLayerGroup)) {
     // layer group
     layer.layers().forEach(function(childLayer){
-      var childHotspots = this.getHotspots(childLayer, excludeMobileMenu, offset, artboardData)
+      var childHotspots = this.getHotspots(childLayer, excludeMobileMenu, offset, artboardData, absoluteRect, indent + 1)
       if (childHotspots != null) {
         Array.prototype.push.apply(hotspots, childHotspots)
       }
     }, this)
   }
 
-  var x = Math.round(layer.absoluteRect().rulerX() - Constants.HOTSPOT_PADDING)
-  var y = Math.round(layer.absoluteRect().rulerY() - Constants.HOTSPOT_PADDING)
+  var x = Math.round(absoluteRect.origin.x - Constants.HOTSPOT_PADDING)
+  var y = Math.round(absoluteRect.origin.y - Constants.HOTSPOT_PADDING)
+  // offset is only used by the mobile menu
   if (offset != null) {
     x += offset.x
     y += offset.y
   }
-  var width = Math.round(layer.absoluteRect().width())
-  var height = Math.round(layer.absoluteRect().height())
+  var width = Math.round(absoluteRect.size.width)
+  var height = Math.round(absoluteRect.size.height)
 
   var artboardName = command.valueForKey_onLayer_forPluginIdentifier(Constants.ARTBOARD_LINK, layer, this.context.plugin.identifier())
   if (artboardName != null && artboardName != "") {
@@ -154,7 +228,7 @@ Exporter.prototype.buildHotspotHTML = function(hotspot) {
 Exporter.prototype.buildHotspots = function(layer, artboardData, indent) {
   var html = ''
   var isMobileMenuLayer = !layer.isKindOfClass(MSArtboardGroup)
-  var offset = isMobileMenuLayer ? {x:-layer.absoluteRect().rulerX(), y:-layer.absoluteRect().rulerY()} : null
+  var offset = isMobileMenuLayer ? {x: -layer.absoluteRect().rulerX(), y: -layer.absoluteRect().rulerY()} : null
   var hotspots = this.getHotspots(layer, !isMobileMenuLayer, offset, artboardData)
   if (hotspots != null) {
     hotspots.forEach(function (hotspot) {

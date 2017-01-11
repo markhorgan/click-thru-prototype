@@ -9,7 +9,8 @@ var Constants = {
   DIALOG_TYPE_ALERT: "alert",
   DIALOG_TYPE_CONFIRM: "confirm",
   TAB_SIZE: 2,
-  HOTSPOT_PADDING: 10
+  HOTSPOT_PADDING: 10,
+  LAYER_LOGGING: false
 }
 
 Constants.KEYS = [Constants.ARTBOARD_LINK, Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE,
