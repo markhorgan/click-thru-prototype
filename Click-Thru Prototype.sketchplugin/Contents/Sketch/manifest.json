@@ -37,6 +37,12 @@
       "identifier" : "mobileMenuButton"
     },
     {
+      "script" : "retina_images_setting.js",
+      "handler" : "onRun",
+      "name" : "Retina Images Setting",
+      "identifier" : "retinaImagesSetting"
+    },
+    {
       "script" : "mobile_menu.js",
       "handler" : "mobileMenu",
       "name" : "Set Mobile Menu",
@@ -51,6 +57,7 @@
       "javaScriptDialog",
       "mobileMenuButton",
       "mobileMenu",
+      "retinaImagesSetting",
       "exportToHTML"
     ]
   }

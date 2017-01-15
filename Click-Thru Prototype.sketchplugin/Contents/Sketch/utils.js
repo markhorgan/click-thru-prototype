@@ -52,11 +52,13 @@ Utils.valueForKeyOnLayers = function(key, selection, context, nullValue) {
     }
     lastValue = value
   })
-  if (value == null) {
-    return nullValue
-  } else {
-    return value
-  }
+  return value == null ? nullValue : value
+}
+
+// nullValue: optional, default: null
+Utils.valueForKeyOnDocument = function(key, context, nullValue) {
+  var value = context.command.valueForKey_onDocument_forPluginIdentifier(key, context.document.documentData(), context.plugin.identifier())
+  return value == null ? nullValue : value
 }
 
 var _deleteFromArtboard = function(layer, ignoreLayer, key, context) {
@@ -98,6 +100,10 @@ Utils.setValueOnLayers = function(value, key, selection, context, exclusiveOnLay
       })
     })
   }
+}
+
+Utils.setValueOnDocument = function(value, key, context) {
+  context.command.setValue_forKey_onDocument_forPluginIdentifier(value, key, context.document.documentData(), context.plugin.identifier())
 }
 
 // str: optional, default: " "

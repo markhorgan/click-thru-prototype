@@ -5,6 +5,7 @@ var Exporter = function(outputPath, page, context) {
   this.page = page
   this.pagePath = outputPath + "/" + Utils.toFilename(this.page.name())
   this.context = context
+  this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, true)
 }
 
 Exporter.prototype.hasMobileMenu = function(){
@@ -17,19 +18,19 @@ Exporter.prototype.hasMobileMenu = function(){
 
 Exporter.prototype.generateCSSFile = function() {
   var fileManager = NSFileManager.defaultManager()
-  var path = this.pagePath + "/css"
+  var path = this.pagePath + "/" + Constants.CSS_DIRECTORY
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
 
   var css = 'body { margin: 0 }\n' +
     '.artboard-container { position: relative; margin: 0 auto; display: none }\n' +
-    '.artboard-image { position: relative; z-index: 0; display: block }\n' +
+    '.artboard-image { position: relative; z-index: 0; }\n' +
     '.hotspot { position: absolute; z-index: 1; display: block; padding: ' + Constants.HOTSPOT_PADDING + 'px; border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1) }\n'
 
   if (this.hasMobileMenu()) {
     css += '.mobile-menu-container { position: absolute; z-index: 2; display: none }\n' +
-      '.mobile-menu-image { position: position; z-index: 0; display: block }\n' +
+      '.mobile-menu-image { position: position; z-index: 0; }\n' +
       '.mobile-menu-container .hotspot { z-index: 3 }\n'
   }
 
@@ -38,7 +39,7 @@ Exporter.prototype.generateCSSFile = function() {
 
 Exporter.prototype.generateJSFile = function(){
   var fileManager = NSFileManager.defaultManager()
-  var path = this.pagePath + "/js"
+  var path = this.pagePath + "/" + Constants.JS_DIRECTORY
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
@@ -172,7 +173,7 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
 
   var x = Math.round(absoluteRect.origin.x - Constants.HOTSPOT_PADDING)
   var y = Math.round(absoluteRect.origin.y - Constants.HOTSPOT_PADDING)
-  // offset is only used by the mobile menu
+  // offset is used by the mobile menu
   if (offset != null) {
     x += offset.x
     y += offset.y
@@ -216,7 +217,7 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
 }
 
 Exporter.prototype.buildHotspotHTML = function(hotspot) {
-  var style = "left:" + hotspot.x + "px;top:" + hotspot.y + "px;width:" + hotspot.width + "px;height:" + hotspot.height + "px"
+  var style = "left:" + hotspot.x + "px; top:" + hotspot.y + "px; width:" + hotspot.width + "px; height:" + hotspot.height + "px"
   var html = '<a href="' + hotspot.href + '" class="hotspot" style="' + style + '"'
   if (hotspot.target != null) {
     html += ' target="' + hotspot.target + '"'
@@ -242,17 +243,32 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
   var html = '<style>\n'
 
   artboardSet.forEach(function(artboardData, index) {
+    // artboard container
     html += '#' + this.getCSSName(artboardData, "artboard-container") + ' { width: ' + artboardData.artboard.frame().width() + 'px'
     if (index == 0) {
       html += '; display: block'
     }
     html += ' }\n'
+
     if (artboardData.mobileMenuLayer != null) {
+      // mobile menu
+      // container
       var mobileMenuLayer = artboardData.mobileMenuLayer
       var left = mobileMenuLayer.absoluteRect().rulerX() + (Math.floor((mobileMenuLayer.frame().width() - mobileMenuLayer.absoluteInfluenceRect().size.width) / 2))
       var top = mobileMenuLayer.absoluteRect().rulerY() + (Math.floor((mobileMenuLayer.frame().height() - mobileMenuLayer.absoluteInfluenceRect().size.height) / 2))
       html += '#' + this.getCSSName(artboardData, "mobile-menu-container") + ' { left:' + left + 'px; top:' + top + 'px }\n'
+      // image
+      var width = mobileMenuLayer.absoluteInfluenceRect().size.width
+      var height = mobileMenuLayer.absoluteInfluenceRect().size.height
+      html += '#' + this.getCSSName(artboardData, "mobile-menu-image") + ' { width: ' + width + 'px; height: ' + height + 'px; background: url("' + Constants.IMAGES_DIRECTORY + this.getMobileMenuImageName(artboardData.artboard, 1) + '") no-repeat; }\n'
     }
+
+    // artboard image
+    var width = artboardData.artboard.frame().width()
+    var height = artboardData.artboard.frame().height()
+    html += '#' + this.getCSSName(artboardData, "artboard-image") + ' { width: ' + width + 'px; height: ' + height + 'px; background: url("' + Constants.IMAGES_DIRECTORY + this.getArtboardImageName(artboardData.artboard, 1) + '") no-repeat; }\n'
+
+    // background color
     if (index == 0) {
       if (artboardData.artboard.hasBackgroundColor()) {
         var backgroundColor = Utils.colorToHex(artboardData.artboard.backgroundColor())
@@ -261,9 +277,29 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
     }
   }, this)
 
+  // retina media query
+  if (this.retinaImages) {
+    html += '@media (-webkit-min-device-pixel-ratio: 2), (min--moz-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 2/1), (min-resolution: 192dpi), (min-resolution: 2dppx) {\n'
+    artboardSet.forEach(function (artboardData) {
+      if (artboardData.mobileMenuLayer != null) {
+        // mobile menu image
+        var mobileMenuLayer = artboardData.mobileMenuLayer
+        var width = mobileMenuLayer.absoluteInfluenceRect().size.width
+        var height = mobileMenuLayer.absoluteInfluenceRect().size.height
+        html += Utils.tab(1) + '#' + this.getCSSName(artboardData, "mobile-menu-image") + ' { background-image: url("' + Constants.IMAGES_DIRECTORY + this.getMobileMenuImageName(artboardData.artboard, 2) + '"); background-size: ' + width + 'px ' + height + 'px; }\n'
+      }
+
+      // artboard image
+      var width = artboardData.artboard.frame().width()
+      var height = artboardData.artboard.frame().height()
+      html += Utils.tab(1) + '#' + this.getCSSName(artboardData, "artboard-image") + ' { background-image: url("' + Constants.IMAGES_DIRECTORY + this.getArtboardImageName(artboardData.artboard, 2) + '"); background-size: ' + width + 'px ' + height + 'px; }\n'
+    }, this)
+    html += '}\n'
+  }
+
+  // responsive media queries
   artboardSet.forEach(function(artboardData, index){
     if (index > 0) {
-      // media query
       var previousArtboardData = artboardSet[index - 1]
       html += '@media screen and (max-width: ' + (previousArtboardData.artboard.frame().width() - 1) + 'px) {\n'
       // hide other artboards
@@ -291,12 +327,14 @@ Exporter.prototype.buildEmbeddedCSS = function(artboardSet) {
   return html
 }
 
-Exporter.prototype.getArtboardImageName = function(artboard) {
-  return Utils.toFilename(artboard.name(), false) + ".png"
+Exporter.prototype.getArtboardImageName = function(artboard, scale) {
+  var suffix = scale == 2 ? "@2x" : ""
+  return Utils.toFilename(artboard.name(), false) + suffix + ".png"
 }
 
-Exporter.prototype.getMobileMenuImageName = function(artboard) {
-  return Utils.toFilename(artboard.name(), false) + "_mobile_menu.png"
+Exporter.prototype.getMobileMenuImageName = function(artboard, scale) {
+  var suffix = scale == 2 ? "@2x" : ""
+  return Utils.toFilename(artboard.name(), false) + "_mobile_menu" + suffix + ".png"
 }
 
 Exporter.prototype.getCSSName = function(artboardData, suffix) {
@@ -308,9 +346,8 @@ Exporter.prototype.buildArtboardHTML = function(artboardData, nestedHTML) {
   var artboard = artboardData.artboard
   var width = artboard.frame().width()
   var height = artboard.frame().height()
-  var className = this.getCSSName(artboardData, "artboard")
-  var html = Utils.tab(1) + '<div id="'+className+'-container" class="artboard-container">\n' +
-    Utils.tab(2) + '<img src="images/'+this.getArtboardImageName(artboard)+'" width="'+width+'" height="'+height+'" class="artboard-image"/>\n' +
+  var html = Utils.tab(1) + '<div id="' + this.getCSSName(artboardData, "artboard-container") + '" class="artboard-container">\n' +
+    Utils.tab(2) + '<div id="' + this.getCSSName(artboardData, "artboard-image") + '" class="artboard-image"></div>\n' +
     this.buildHotspots(artboard, artboardData, 2)
   if (nestedHTML != null) {
     html += nestedHTML
@@ -324,11 +361,8 @@ Exporter.prototype.buildMobileMenuHTML = function(artboardData, indent) {
   if (mobileMenuLayer == null) {
     return null
   }
-  var width = mobileMenuLayer.absoluteInfluenceRect().size.width
-  var height = mobileMenuLayer.absoluteInfluenceRect().size.height
-  var idName = this.getCSSName(artboardData, "mobile-menu-container")
-  return  Utils.tab(indent) + '<div id="'+idName+'" class="mobile-menu-container">\n' +
-    Utils.tab(indent + 1) + '<img src="images/'+this.getMobileMenuImageName(artboardData.artboard)+'" width="'+width+'" height="'+height+'" class="mobile-menu-image"/>\n' +
+  return  Utils.tab(indent) + '<div id="' + this.getCSSName(artboardData, "mobile-menu-container") + '" class="mobile-menu-container">\n' +
+    Utils.tab(indent + 1) + '<div id="' + this.getCSSName(artboardData, "mobile-menu-image")  + '" class="mobile-menu-image"></div>\n' +
     this.buildHotspots(mobileMenuLayer, artboardData, indent + 1) +
     Utils.tab(indent) + '</div>\n'
 }
@@ -382,9 +416,22 @@ Exporter.prototype.findLayer = function(key, layer) {
   return targetLayer
 }
 
+Exporter.prototype.exportImage = function(layer, scale, imagePath) {
+  var slice
+  if (layer.isKindOfClass(MSArtboardGroup)) {
+    slice = MSExportRequest.exportRequestsFromExportableLayer(layer).firstObject()
+  } else {
+    slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(layer, layer.absoluteInfluenceRect(), false).firstObject()
+  }
+  slice.scale = scale
+  slice.saveForWeb = true
+  slice.format = "png"
+  this.context.document.saveArtboardOrSlice_toFile(slice, imagePath)
+}
+
 Exporter.prototype.exportImages = function(artboardSet) {
   var doc = this.context.document
-  var imagesPath = this.pagePath + "/images/"
+  var imagesPath = this.pagePath + "/" + Constants.IMAGES_DIRECTORY
   artboardSet.forEach(function(artboardData){
     var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
@@ -392,13 +439,17 @@ Exporter.prototype.exportImages = function(artboardSet) {
       mobileMenuLayer.setIsVisible(false)
     }
 
-    doc.saveArtboardOrSlice_toFile(artboardData.artboard, imagesPath + this.getArtboardImageName(artboardData.artboard))
+    this.exportImage(artboardData.artboard, 1, imagesPath + this.getArtboardImageName(artboardData.artboard, 1))
+    if (this.retinaImages) {
+      this.exportImage(artboardData.artboard, 2, imagesPath + this.getArtboardImageName(artboardData.artboard, 2))
+    }
 
     if (mobileMenuLayer != null) {
       mobileMenuLayer.setIsVisible(true)
-      var slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(mobileMenuLayer, mobileMenuLayer.absoluteInfluenceRect(), false).firstObject()
-      slice.format = "png"
-      doc.saveArtboardOrSlice_toFile(slice, imagesPath + this.getMobileMenuImageName(artboardData.artboard))
+      this.exportImage(mobileMenuLayer, 1, imagesPath + this.getMobileMenuImageName(artboardData.artboard, 1))
+      if (this.retinaImages) {
+        this.exportImage(mobileMenuLayer, 2, imagesPath + this.getMobileMenuImageName(artboardData.artboard, 2))
+      }
       if (!mobileMenuLayerIsVisible) {
         mobileMenuLayer.setIsVisible(false)
       }

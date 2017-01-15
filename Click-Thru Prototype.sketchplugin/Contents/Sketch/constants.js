@@ -8,9 +8,13 @@ var Constants = {
   DIALOG_TEXT: "dialogText",
   DIALOG_TYPE_ALERT: "alert",
   DIALOG_TYPE_CONFIRM: "confirm",
+  RETINA_IMAGES: "retinaImages",
   TAB_SIZE: 2,
   HOTSPOT_PADDING: 10,
-  LAYER_LOGGING: false
+  LAYER_LOGGING: false,
+  IMAGES_DIRECTORY: "images/",
+  CSS_DIRECTORY: "css/",
+  JS_DIRECTORY: "js/"
 }
 
 Constants.KEYS = [Constants.ARTBOARD_LINK, Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE,
