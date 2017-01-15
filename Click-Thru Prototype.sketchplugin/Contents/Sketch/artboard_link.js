@@ -59,7 +59,7 @@ var getArtboardNamesInPage = function(page, includeNone) {
 var getArtboardNamesInAllPages = function(document) {
 	var artboardNames = ["None"]
 	document.pages().forEach(function(page){
-		if (!page.artboards()[0].isKindOfClass(MSSymbolMaster)) {
+		if (!Utils.isSymbolsPage(page)) {
 			artboardNames.push.apply(artboardNames, getArtboardNamesInPage(page, false))
 		}
 	})

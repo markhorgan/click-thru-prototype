@@ -143,3 +143,7 @@ Utils.getSuffix = function(str1, str2) {
     return null
   }
 }
+
+Utils.isSymbolsPage = function(page) {
+  return page.artboards()[0].isKindOfClass(MSSymbolMaster)
+}

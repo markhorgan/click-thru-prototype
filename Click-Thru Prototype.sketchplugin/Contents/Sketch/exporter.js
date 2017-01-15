@@ -519,7 +519,6 @@ Exporter.prototype.getArtboardSets = function(){
 
 Exporter.prototype.exportArtboards = function () {
   var fileManager = NSFileManager.defaultManager()
-  var doc = this.context.document
 
   // delete and create directory
   if (fileManager.fileExistsAtPath(this.pagePath)) {

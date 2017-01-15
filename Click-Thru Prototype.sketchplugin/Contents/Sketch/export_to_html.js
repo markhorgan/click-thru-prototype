@@ -10,6 +10,11 @@ var onRun = function(context) {
     return
   }
 
+  if (Utils.isSymbolsPage(doc.currentPage())) {
+    UI.displayDialog("You can't export the Symbols page. Please select another page to export.")
+    return
+  }
+
   var fileURL = Utils.saveFileDialog()
   if (fileURL == null) {
     return
