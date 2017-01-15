@@ -26,7 +26,14 @@ Exporter.prototype.generateCSSFile = function() {
   var css = 'body { margin: 0 }\n' +
     '.artboard-container { position: relative; margin: 0 auto; display: none }\n' +
     '.artboard-image { position: relative; z-index: 0; }\n' +
-    '.hotspot { position: absolute; z-index: 1; display: block; padding: ' + Constants.HOTSPOT_PADDING + 'px; border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1) }\n'
+    '.hotspot { position: absolute; z-index: 1; display: block; padding: ' + Constants.HOTSPOT_PADDING + 'px; }\n' +
+    '.hotspot.is-visible { border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1); animation-duration: 2.5s; animation-name: fadeOut; animation-fill-mode: forwards; }\n' +
+    '@keyframes fadeOut {\n' +
+    Utils.tab(1) + '0% { opacity: 0 }\n' +
+    Utils.tab(1) + '45% { opacity: 1 }\n' +
+    Utils.tab(1) + '55% { opacity: 1 }\n' +
+    Utils.tab(1) + '100% { opacity: 0 }\n' +
+    '}\n'
 
   if (this.hasMobileMenu()) {
     css += '.mobile-menu-container { position: absolute; z-index: 2; display: none }\n' +
@@ -39,19 +46,26 @@ Exporter.prototype.generateCSSFile = function() {
 
 Exporter.prototype.generateJSFile = function(){
   var fileManager = NSFileManager.defaultManager()
-  var path = this.pagePath + "/" + Constants.JS_DIRECTORY
-  if (!fileManager.fileExistsAtPath(path)) {
-    fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
+  var jsPath = this.pagePath + "/" + Constants.JS_DIRECTORY
+  var filename = "main.js"
+  var targetPath = jsPath + filename
+  var error = MOPointer.alloc().init()
+  if (!fileManager.fileExistsAtPath(jsPath)) {
+    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(jsPath, false, null, error)) {
+      log(error.value().localizedDescription())
+    }
   }
-
-  var js = '$(function(){\n' +
-      '  $(".hotspot").css("opacity", 1);\n' +
-      '  window.setTimeout(function(){\n' +
-      '    $(".hotspot").animate({opacity: 0}, 500);\n' +
-      '  }, 1500);\n' +
-      '});\n'
-
-  Utils.writeToFile(js, path + "/main.js")
+  error = MOPointer.alloc().init()
+  if (fileManager.fileExistsAtPath(targetPath)) {
+    if (!fileManager.removeItemAtPath_error(targetPath, error)) {
+      log(error.value().localizedDescription())
+    }
+  }
+  var sourcePath = this.context.plugin.url().URLByAppendingPathComponent("Contents").URLByAppendingPathComponent("Sketch").URLByAppendingPathComponent(filename).path()
+  error = MOPointer.alloc().init()
+  if (!fileManager.copyItemAtPath_toPath_error(sourcePath, targetPath, error)) {
+    log(error.value().localizedDescription())
+  }
 }
 
 // returns the main artboard name for an artboard name
