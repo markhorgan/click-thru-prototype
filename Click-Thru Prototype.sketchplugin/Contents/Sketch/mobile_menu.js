@@ -21,8 +21,7 @@ var setBooleanValueOnLayers = function(key, title, informationText, context) {
     return
   }
 
-  var isOn = Utils.valueForKeyOnLayers(key, selection, context, 1)
-  isOn = isOn == 1
+  var isOn = Utils.valueForKeyOnLayers(key, selection, context, 1) == 1
   var alertWindow = buildAlertWindow(title, informationText, isOn)
   var response = alertWindow.runModal()
   switch (response) {

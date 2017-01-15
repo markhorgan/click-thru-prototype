@@ -5,7 +5,7 @@ var Exporter = function(outputPath, page, context) {
   this.page = page
   this.pagePath = outputPath + "/" + Utils.toFilename(this.page.name())
   this.context = context
-  this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, true)
+  this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, 1) == 1
 }
 
 Exporter.prototype.hasMobileMenu = function(){
