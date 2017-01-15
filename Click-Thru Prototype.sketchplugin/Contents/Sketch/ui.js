@@ -72,3 +72,11 @@ UI.buildComboBox = function(frame, values, selectedIndex) {
   }  
   return comboBox
 }
+
+// title: optional, default: "Notice"
+UI.displayDialog = function(text, title) {
+  if (title == null) {
+    title = "Notice"
+  }
+  NSApplication.sharedApplication().displayDialog_withTitle(text, title)
+}

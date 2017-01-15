@@ -82,7 +82,7 @@ var onRun = function(context) {
 	var selection = context.selection
 
 	if (selection.length == 0) {
-		doc.showMessage("Select a one or more layers")
+		UI.displayDialog("Select a one or more layers.")
 		return
 	}
 

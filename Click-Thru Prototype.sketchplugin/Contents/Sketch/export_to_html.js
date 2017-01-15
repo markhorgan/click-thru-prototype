@@ -1,11 +1,12 @@
 @import "utils.js"
 @import "exporter.js"
+@import "ui.js"
 
 var onRun = function(context) {
   var doc = context.document
 
   if (doc.currentPage().artboards().count() == 0) {
-    doc.showMessage("There are no artboards to export")
+    UI.displayDialog("There are no artboards to export.")
     return
   }
 
