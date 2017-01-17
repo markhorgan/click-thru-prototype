@@ -27,7 +27,7 @@ Exporter.prototype.generateCSSFile = function() {
     '.artboard-container { position: relative; margin: 0 auto; display: none }\n' +
     '.artboard-image { position: relative; z-index: 0; }\n' +
     '.hotspot { position: absolute; z-index: 1; display: block; padding: ' + Constants.HOTSPOT_PADDING + 'px; }\n' +
-    '.hotspot.is-visible { border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1); animation-duration: 2.5s; animation-name: fadeOut; animation-fill-mode: forwards; }\n' +
+    '.hotspot.is-visible { border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1); animation: fadeOut 2.5s forwards }\n' +
     '@keyframes fadeOut {\n' +
     Utils.tab(1) + '0% { opacity: 0 }\n' +
     Utils.tab(1) + '45% { opacity: 1 }\n' +
@@ -221,8 +221,7 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
         var isMobileMenuButton = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU_BUTTON, layer, this.context.plugin.identifier())
         if (isMobileMenuButton) {
           // mobile menu button
-          var idName = this.getCSSName(artboardData, "mobile-menu-container")
-          hotspots.push({href: "javascript:$(\'#" + idName + "\').toggle()", x: x, y: y, width: width, height: height})
+          hotspots.push({href: "javascript:toggle(this)", x: x, y: y, width: width, height: height})
         }
       }
     }
@@ -394,7 +393,6 @@ Exporter.prototype.generateHTMLFile = function(artboardSet) {
     '<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />\n' +
     '<link href="css/main.css" rel="stylesheet" type="text/css"/>\n'
   html += this.buildEmbeddedCSS(artboardSet) +
-    '<script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous" type="text/javascript"></script>\n' +
     '<script src="js/main.js" type="text/javascript"></script>\n' +
     '</head>\n<body>\n<main>\n'
   artboardSet.forEach(function(artboardData) {

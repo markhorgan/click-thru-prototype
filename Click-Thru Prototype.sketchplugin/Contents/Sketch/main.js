@@ -25,11 +25,19 @@ var getPageName = function() {
 window.onload = function() {
   var pageName = getPageName();
   var numTimesPageLoaded = parseInt(getCookie(pageName, 0));
-  if (numTimesPageLoaded < 2) {
+  if (numTimesPageLoaded < 1) {
     var elements = document.getElementsByClassName("hotspot");
     for (var i = 0; i < elements.length; i++) {
-      elements[i].className += " is-visible";
+      var element = elements[i];
+      element.className += " is-visible";
+      element.addEventListener("animationend", function(event){
+        event.target.className = "hotspot";
+      });
     }
     setCookie(pageName, numTimesPageLoaded + 1)
   }
+}
+
+window.toggle = function(element) {
+  element.style.display = (element.style.display == 'none') ? 'block' : 'none';
 }
