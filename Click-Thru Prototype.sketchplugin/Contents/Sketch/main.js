@@ -1,11 +1,10 @@
 var getCookie = function(key, defaultValue){
-  console.log(document.cookie);
   var cookies = document.cookie.split(';');
   for (var i = 0; i < cookies.length; i++) {
     var cookie = cookies[i]
     if (cookie != null) {
-      var parts = cookie.split("=");
-      if (parts[0].trim() == key) {
+      var parts = cookie.trim().split("=");
+      if (parts[0] == key) {
         return parts[1];
       }
     }
