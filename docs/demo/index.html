@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<head>
+<title>index</title>
+<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+<link href="css/main.css" rel="stylesheet" type="text/css"/>
+<style>
+#main-artboard-container { width: 1200px; display: block }
+#main-artboard-image { width: 1200px; height: 951px; background: url("images/index.png") no-repeat; }
+#tablet-artboard-container { width: 768px }
+#tablet-artboard-image { width: 768px; height: 1121px; background: url("images/index_tablet.png") no-repeat; }
+#mobile-artboard-container { width: 320px }
+#mobile-mobile-menu-container { left:-4px; top:52px }
+#mobile-mobile-menu-image { width: 328px; height: 96px; background: url("images/index_mobile_mobile_menu.png") no-repeat; }
+#mobile-artboard-image { width: 320px; height: 1369px; background: url("images/index_mobile.png") no-repeat; }
+@media (-webkit-min-device-pixel-ratio: 2), (min--moz-device-pixel-ratio: 2), (-o-min-device-pixel-ratio: 2/1), (min-resolution: 192dpi), (min-resolution: 2dppx) {
+  #main-artboard-image { background-image: url("images/index@2x.png"); background-size: 1200px 951px; }
+  #tablet-artboard-image { background-image: url("images/index_tablet@2x.png"); background-size: 768px 1121px; }
+  #mobile-mobile-menu-image { background-image: url("images/index_mobile_mobile_menu@2x.png"); background-size: 328px 96px; }
+  #mobile-artboard-image { background-image: url("images/index_mobile@2x.png"); background-size: 320px 1369px; }
+}
+@media screen and (max-width: 1199px) {
+  #main-artboard-container, #mobile-artboard-container { display: none }
+  #tablet-artboard-container { display: block }
+}
+@media screen and (max-width: 767px) {
+  #main-artboard-container, #tablet-artboard-container { display: none }
+  #mobile-artboard-container { display: block }
+  body { background-color: #ffffff }
+}
+</style>
+<script src="js/main.js" type="text/javascript"></script>
+</head>
+<body>
+<main>
+  <div id="main-artboard-container" class="artboard-container">
+    <div id="main-artboard-image" class="artboard-image"></div>
+    <a href="http://facebook.com" class="hotspot" style="left:602px; top:855px; width:34px; height:34px" target="_blank"></a>
+    <a href="http://twitter.com" class="hotspot" style="left:545px; top:855px; width:34px; height:34px" target="_blank"></a>
+    <a href="inside-page.html" class="hotspot" style="left:633px; top:677px; width:432px; height:72px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:117px; top:668px; width:432px; height:72px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:633px; top:542px; width:432px; height:74px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:117px; top:542px; width:432px; height:72px"></a>
+    <a href="javascript:alert('Your download will begin soon.')" class="hotspot" style="left:561px; top:367px; width:228px; height:65px"></a>
+    <a href="index.html" class="hotspot" style="left:965px; top:11px; width:43px; height:19px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:1040px; top:11px; width:42px; height:19px"></a>
+  </div>
+  <div id="tablet-artboard-container" class="artboard-container">
+    <div id="tablet-artboard-image" class="artboard-image"></div>
+    <a href="http://facebook.com" class="hotspot" style="left:386px; top:1025px; width:34px; height:34px" target="_blank"></a>
+    <a href="http://twitter.com" class="hotspot" style="left:329px; top:1025px; width:34px; height:34px" target="_blank"></a>
+    <a href="inside-page.html" class="hotspot" style="left:80px; top:857px; width:432px; height:72px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:80px; top:748px; width:432px; height:72px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:80px; top:635px; width:432px; height:73px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:80px; top:522px; width:432px; height:73px"></a>
+    <a href="javascript:alert('Your download will begin soon.')" class="hotspot" style="left:81px; top:356px; width:228px; height:65px"></a>
+    <a href="index.html" class="hotspot" style="left:603px; top:11px; width:43px; height:19px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:678px; top:11px; width:42px; height:19px"></a>
+  </div>
+  <div id="mobile-artboard-container" class="artboard-container">
+    <div id="mobile-artboard-image" class="artboard-image"></div>
+    <a href="http://facebook.com" class="hotspot" style="left:162px; top:1273px; width:34px; height:34px" target="_blank"></a>
+    <a href="http://twitter.com" class="hotspot" style="left:105px; top:1273px; width:34px; height:34px" target="_blank"></a>
+    <a href="inside-page.html" class="hotspot" style="left:5px; top:1054px; width:290px; height:129px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:5px; top:887px; width:290px; height:135px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:5px; top:716px; width:290px; height:140px"></a>
+    <a href="inside-page.html" class="hotspot" style="left:5px; top:508px; width:290px; height:174px"></a>
+    <a href="javascript:alert('Your download will begin soon.')" class="hotspot" style="left:36px; top:369px; width:228px; height:65px"></a>
+    <a href="javascript:toggle('mobile-mobile-menu-container')" class="hotspot" style="left:265px; top:8px; width:30px; height:21px"></a>
+    <div id="mobile-mobile-menu-container" class="mobile-menu-container">
+      <div id="mobile-mobile-menu-image" class="mobile-menu-image"></div>
+      <a href="inside-page.html" class="hotspot" style="left:-10px; top:35px; width:320px; height:43px"></a>
+      <a href="index.html" class="hotspot" style="left:-10px; top:-10px; width:320px; height:44px"></a>
+    </div>
+  </div>
+</main>
+</body>
+</html>

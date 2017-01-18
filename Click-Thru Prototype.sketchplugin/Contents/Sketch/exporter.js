@@ -221,7 +221,8 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
         var isMobileMenuButton = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU_BUTTON, layer, this.context.plugin.identifier())
         if (isMobileMenuButton) {
           // mobile menu button
-          hotspots.push({href: "javascript:toggle(this)", x: x, y: y, width: width, height: height})
+          var idName = this.getCSSName(artboardData, "mobile-menu-container")
+          hotspots.push({href: "javascript:toggle('" + idName + "')", x: x, y: y, width: width, height: height})
         }
       }
     }

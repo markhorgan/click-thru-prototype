@@ -133,13 +133,14 @@ Utils.getSuffix = function(str1, str2) {
     i++
   }
   var digitRegExp = /^\d+$/
-  var separatorRegExp = /[\s-_]+/
-  var suffix = str1.substr(i - 1).replace(/^[\s-_]+/, "").trim()
-  if (i > 1 && !digitRegExp.test(suffix) && !separatorRegExp.test(suffix)) {
-    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix)
-    return suffix
+  var separatorRegExp = /((?!^)[\s-_]+)/
+  var startsWithSeparatorRegExp = /^[\s-_]/
+  var suffix = str1.substr(i - 1)
+  if (i > 1 && !digitRegExp.test(suffix) && !separatorRegExp.test(suffix) && startsWithSeparatorRegExp.test(suffix)) {
+    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix + ":")
+    return suffix.replace(/^[\s-_]+/, "").trim()
   } else {
-    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix + " - rejected")
+    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix + ": - rejected")
     return null
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "Click-Thru Prototype",
-  "description": "Exports artboards as images inside HTML pages with clickable hotspots",
+  "description": "Exports a HTML click-through prototype of your responsive website design",
   "author" : "Mark Horgan",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
