@@ -2,8 +2,8 @@
 @import "utils.js"
 
 var Exporter = function(outputPath, page, context) {
+  this.outputPath = outputPath
   this.page = page
-  this.pagePath = outputPath + "/" + Utils.toFilename(this.page.name())
   this.context = context
   this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, 1) == 1
 }
@@ -18,7 +18,7 @@ Exporter.prototype.hasMobileMenu = function(){
 
 Exporter.prototype.generateCSSFile = function() {
   var fileManager = NSFileManager.defaultManager()
-  var path = this.pagePath + "/" + Constants.CSS_DIRECTORY
+  var path = this.outputPath + "/" + Constants.CSS_DIRECTORY
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
@@ -46,7 +46,7 @@ Exporter.prototype.generateCSSFile = function() {
 
 Exporter.prototype.generateJSFile = function(){
   var fileManager = NSFileManager.defaultManager()
-  var jsPath = this.pagePath + "/" + Constants.JS_DIRECTORY
+  var jsPath = this.outputPath + "/" + Constants.JS_DIRECTORY
   var filename = "main.js"
   var targetPath = jsPath + filename
   var error = MOPointer.alloc().init()
@@ -406,7 +406,7 @@ Exporter.prototype.generateHTMLFile = function(artboardSet) {
   html += '</main>\n</body>\n</html>\n'
 
   var filename = Utils.toFilename(mainArtboard.name()) + ".html"
-  var filePath = this.pagePath + "/" + filename
+  var filePath = this.outputPath + "/" + filename
   Utils.writeToFile(html, filePath)
 }
 
@@ -437,14 +437,14 @@ Exporter.prototype.exportImage = function(layer, scale, imagePath) {
     slice = MSExportRequest.exportRequestsFromExportableLayer_inRect_useIDForName(layer, layer.absoluteInfluenceRect(), false).firstObject()
   }
   slice.scale = scale
-  slice.saveForWeb = true
+  slice.saveForWeb = false
   slice.format = "png"
   this.context.document.saveArtboardOrSlice_toFile(slice, imagePath)
 }
 
 Exporter.prototype.exportImages = function(artboardSet) {
   var doc = this.context.document
-  var imagesPath = this.pagePath + "/" + Constants.IMAGES_DIRECTORY
+  var imagesPath = this.outputPath + "/" + Constants.IMAGES_DIRECTORY
   artboardSet.forEach(function(artboardData){
     var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
@@ -534,10 +534,10 @@ Exporter.prototype.exportArtboards = function () {
   var fileManager = NSFileManager.defaultManager()
 
   // delete and create directory
-  if (fileManager.fileExistsAtPath(this.pagePath)) {
-    fileManager.removeItemAtPath_error(this.pagePath, null)
+  if (fileManager.fileExistsAtPath(this.outputPath)) {
+    fileManager.removeItemAtPath_error(this.outputPath, null)
   }
-  fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this.pagePath, false, null, null)
+  fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this.outputPath, false, null, null)
 
   this.artboardSets = this.getArtboardSets()
 

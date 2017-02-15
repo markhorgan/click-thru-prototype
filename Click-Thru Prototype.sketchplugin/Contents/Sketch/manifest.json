@@ -1,6 +1,6 @@
 {
   "name": "Click-Thru Prototype",
-  "description": "Exports a HTML click-through prototype of your responsive website design",
+  "description": "Generates a HTML click-through prototype of your responsive website design",
   "author" : "Mark Horgan",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,

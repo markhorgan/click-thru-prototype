@@ -10,7 +10,7 @@ var Constants = {
   DIALOG_TYPE_CONFIRM: "confirm",
   RETINA_IMAGES: "retinaImages",
   TAB_SIZE: 2,
-  HOTSPOT_PADDING: 10,
+  HOTSPOT_PADDING: 0,
   LAYER_LOGGING: false,
   IMAGES_DIRECTORY: "images/",
   CSS_DIRECTORY: "css/",
