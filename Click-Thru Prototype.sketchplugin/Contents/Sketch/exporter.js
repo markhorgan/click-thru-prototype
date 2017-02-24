@@ -531,14 +531,6 @@ Exporter.prototype.getArtboardSets = function(){
 }
 
 Exporter.prototype.exportArtboards = function () {
-  var fileManager = NSFileManager.defaultManager()
-
-  // delete and create directory
-  if (fileManager.fileExistsAtPath(this.outputPath)) {
-    fileManager.removeItemAtPath_error(this.outputPath, null)
-  }
-  fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this.outputPath, false, null, null)
-
   this.artboardSets = this.getArtboardSets()
 
   this.generateCSSFile()
