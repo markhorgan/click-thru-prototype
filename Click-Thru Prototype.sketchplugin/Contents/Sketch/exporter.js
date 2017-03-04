@@ -68,20 +68,6 @@ Exporter.prototype.generateJSFile = function(){
   }
 }
 
-// returns the main artboard name for an artboard name
-Exporter.prototype.getArtboardName = function(artboardName) {
-  var retArtboardName = artboardName
-  this.artboardSets.some(function(artboardSet){
-    return artboardSet.some(function(artboardData){
-      if (artboardName == String(artboardData.artboard.name())) {
-        retArtboardName = artboardSet[0].artboard.name()
-        return true
-      }
-    })
-  })
-  return retArtboardName
-}
-
 Exporter.prototype.getAbsoluteRect = function(layer, parentAbsoluteRect, indent) {
   var x, y, returnRect
   if (layer.isKindOfClass(MSArtboardGroup)) {
@@ -198,7 +184,7 @@ Exporter.prototype.getHotspots = function(layer, excludeMobileMenu, offset, artb
   var artboardName = command.valueForKey_onLayer_forPluginIdentifier(Constants.ARTBOARD_LINK, layer, this.context.plugin.identifier())
   if (artboardName != null && artboardName != "") {
     // artboard link
-    hotspots.push({href:Utils.toFilename(this.getArtboardName(artboardName))+".html", x:x, y:y, width:width, height:height})
+    hotspots.push({href:Utils.toFilename(artboardName)+".html", x:x, y:y, width:width, height:height})
   } else {
     // external link
     var externalLink = command.valueForKey_onLayer_forPluginIdentifier(Constants.EXTERNAL_LINK, layer, this.context.plugin.identifier())
@@ -405,7 +391,7 @@ Exporter.prototype.generateHTMLFile = function(artboardSet) {
   }, this)
   html += '</main>\n</body>\n</html>\n'
 
-  var filename = Utils.toFilename(mainArtboard.name()) + ".html"
+  var filename = Utils.toFilename(artboardSet[0].baseName) + ".html"
   var filePath = this.outputPath + "/" + filename
   Utils.writeToFile(html, filePath)
 }
@@ -470,47 +456,40 @@ Exporter.prototype.exportImages = function(artboardSet) {
   }, this)
 }
 
-Exporter.prototype.getArtboardSet = function(artboard, artboardSets) {
-  for (var i = 0; i < artboardSets.length; i++) {
-    var artboardSet = artboardSets[i]
-    var suffix = Utils.getSuffix(artboard.name(), artboardSet[0].artboard.name())
-    if (suffix != null) {
+Exporter.prototype.getArtboardSets = function(){
+  var artboardSets = new Array()
+  var artboardSetsByBaseName = new Object()
+
+  // group into artboard sets
+  var artboards = this.page.artboards()
+  artboards.forEach(function(artboard){
+    var baseName, suffix, artboardSet
+    var retVals = Utils.getArtboardNameParts(artboard, artboards)
+    if (retVals != null) {
+      // part of a set
+      baseName = retVals[0]
+      suffix = retVals[1]
       if (suffix.length == 0) {
         suffix = null
       }
-      return [artboardSet, suffix]
-    }
-  }
-  return [null, null]
-}
-
-Exporter.prototype.getArtboardSets = function(){
-  var artboardSets = new Array()
-
-  // sort by name
-  var artboards = this.page.artboards().sort(function(a, b) {
-    if (a.name() < b.name()) {
-      return -1
-    } else if (a.name() > b.name()) {
-      return 1
+      artboardSet = artboardSetsByBaseName[baseName]
+      if (artboardSet == null) {
+        artboardSet = new Array()
+        artboardSets.push(artboardSet)
+        artboardSetsByBaseName[baseName] = artboardSet
+      }
     } else {
-      return 0
-    }
-  })
-
-  // group into artboard sets
-  artboards.forEach(function(artboard){
-    var retVals = this.getArtboardSet(artboard, artboardSets), artboardSet = retVals[0], suffix = retVals[1]
-    if (artboardSet == null) {
+      // not part of a set
+      baseName = artboard.name()
       artboardSet = new Array()
       artboardSets.push(artboardSet)
     }
-    artboardSet.push({artboard: artboard, suffix: suffix, mobileMenuLayer: this.findLayer(Constants.IS_MOBILE_MENU, artboard)})
+    artboardSet.push({artboard: artboard, baseName: baseName, suffix: suffix, mobileMenuLayer: this.findLayer(Constants.IS_MOBILE_MENU, artboard)})
   }, this)
 
   // sort by width
   for (var i = 0; i < artboardSets.length; i++) {
-    artboardSets[i] = artboardSets[i].sort(function(a, b){
+    artboardSets[i].sort(function(a, b){
       if (a.artboard.frame().width() < b.artboard.frame().width()) {
         return 1
       } else if (a.artboard.frame().width() > b.artboard.frame().width()) {

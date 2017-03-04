@@ -125,24 +125,46 @@ Utils.tab = function(count, tabSize) {
   return Utils.repeatStr(count * tabSize)
 }
 
-Utils.getSuffix = function(str1, str2) {
+Utils.getArtboardNameParts = function(artboard, artboards) {
+  for (var i = 0; i < artboards.length; i++) {
+    var itArtboard = artboards[i]
+    var retVals = Utils._getArtboardPartNames(artboard.name(), itArtboard.name())
+    if (retVals != null) {
+      return retVals
+    }
+  }
+  return null
+}
+
+Utils._getArtboardPartNames = function(str1, str2) {
   str1 = String(str1)
   str2 = String(str2)
+  if (str1 == str2) {
+    return
+  }
   var i = 0
+  // find where they diverge
   while (i <= str1.length && i <= str2.length && str1.substring(0, i) == str2.substring(0, i)) {
     i++
   }
-  var digitRegExp = /^\d+$/
-  var separatorRegExp = /((?!^)[\s-_]+)/
-  var startsWithSeparatorRegExp = /^[\s-_]/
-  var suffix = str1.substr(i - 1)
-  if (i > 1 && !digitRegExp.test(suffix) && !separatorRegExp.test(suffix) && startsWithSeparatorRegExp.test(suffix)) {
-    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix + ":")
-    return suffix.replace(/^[\s-_]+/, "").trim()
-  } else {
-    //log("str1: " + str1 + ", str2:" + str2 + ", suffix:" + suffix + ": - rejected")
-    return null
+  if (i > 0) {
+    i--
   }
+  if (i < str1.length && i < str2.length) {
+    // go back to the separator
+    var seperatorRegex = /[\s-_]/
+    while (i > 1 && seperatorRegex.test(str1.substr(i - 1, 1))) {
+      i--
+    }
+  }
+  var baseName = str1.substr(0, i)
+  var suffix = str1.substr(i)
+  if (i > 0 && (suffix.length == 0 || /^[\s-_]+.[^\s-_]+/.test(suffix))) {
+    //log("str1: " + str1 + ", str2: " + str2 + ", baseName:" + baseName + ":, suffix:" + suffix.replace(/^[\s-_]+/, "").trim() + ":")
+    return [baseName, suffix.replace(/^[\s-_]+/, "").trim()]
+  } /* else {
+    log("str1: " + str1 + ", str2: " + str2 + ", baseName:" + baseName + ":, suffix:" + suffix + ": - rejected")
+  } */
 }
 
 Utils.isSymbolsPage = function(page) {

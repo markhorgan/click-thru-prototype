@@ -4,7 +4,7 @@
   "author" : "Mark Horgan",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
-  "version" : "1.0",
+  "version" : "1.0.1",
   "commands" : [
     {
       "script" : "artboard_link.js",

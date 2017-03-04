@@ -20,13 +20,16 @@ var buildAlertWindow = function(artboardNames, selectedIndex) {
 	return [alertWindow, artboardComboBox]
 }
 
-var isAssociatedArtboard = function(artboard, artboards) {
-	return artboards.some(function(itArtboard){
-		var suffix = Utils.getSuffix(artboard.name(), itArtboard.name())
-		if (suffix != null && suffix.length > 0) {
-			return true
+var getBaseName = function(artboard, artboards, artboardNames) {
+	for (var i = 0; i < artboards.length; i++) {
+		var itArtboard = artboards[i]
+    var retVals = Utils.getArtboardNameParts(artboard.name(), itArtboard.name()), baseName = retVals[0]
+		if (baseName != null && artboardNames.includes(baseName)) {
+			return baseName
 		}
-	})
+	}
+
+
 }
 
 // includeNone: optional, default: true
@@ -34,35 +37,37 @@ var getArtboardNamesInPage = function(page, includeNone) {
 	if (includeNone == null) {
 		includeNone = true
 	}
-	// sort artboards by name
-	var artboards = page.artboards().sort(function(a, b) {
-		if (a.name() < b.name()) {
-			return -1
-		} else if (a.name() > b.name()) {
-			return 1
-		} else {
-			return 0
-		}
-	})
+	var artboards = page.artboards()
 	var artboardNames = new Array()
-	if (includeNone) {
-		artboardNames.push("None")
-	}
-	artboards.forEach(function(artboard){
-		if (!isAssociatedArtboard(artboard, artboards)) {
-			artboardNames.push(artboard.name())
-		}
+  artboards.forEach(function(artboard) {
+		var retVals = Utils.getArtboardNameParts(artboard, artboards)
+		if (retVals != null) {
+			// part of a set
+			var baseName = retVals[0]
+			if (!artboardNames.includes(baseName)) {
+				artboardNames.push(baseName)
+    	}
+		} else {
+			// not part of a set
+  		artboardNames.push(artboard.name())
+  	}
 	})
+	artboardNames.sort()
+  if (includeNone) {
+    artboardNames.unshift("None")
+  }
 	return artboardNames
 }
 
 var getArtboardNamesInAllPages = function(document) {
-	var artboardNames = ["None"]
+	var artboardNames = new Array()
 	document.pages().forEach(function(page){
 		if (!Utils.isSymbolsPage(page)) {
 			artboardNames.push.apply(artboardNames, getArtboardNamesInPage(page, false))
 		}
 	})
+	artboardNames.sort()
+	artboardNames.unshift("None")
 	return artboardNames
 }
 
