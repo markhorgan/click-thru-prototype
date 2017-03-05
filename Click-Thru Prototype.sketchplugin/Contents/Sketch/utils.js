@@ -128,7 +128,7 @@ Utils.tab = function(count, tabSize) {
 Utils.getArtboardNameParts = function(artboard, artboards) {
   for (var i = 0; i < artboards.length; i++) {
     var itArtboard = artboards[i]
-    var retVals = Utils._getArtboardPartNames(artboard.name(), itArtboard.name())
+    var retVals = Utils._getArtboardNameParts(artboard.name(), itArtboard.name())
     if (retVals != null) {
       return retVals
     }
@@ -136,7 +136,7 @@ Utils.getArtboardNameParts = function(artboard, artboards) {
   return null
 }
 
-Utils._getArtboardPartNames = function(str1, str2) {
+Utils._getArtboardNameParts = function(str1, str2) {
   str1 = String(str1)
   str2 = String(str2)
   if (str1 == str2) {
