@@ -1,0 +1,14 @@
+body { margin: 0 }
+.artboard-container { position: relative; margin: 0 auto; display: none }
+.artboard-image { position: relative; z-index: 0; }
+.hotspot { position: absolute; z-index: 1; display: block; padding: 10px; }
+.hotspot.is-visible { border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1); animation: fadeOut 2.5s forwards }
+@keyframes fadeOut {
+  0% { opacity: 0 }
+  45% { opacity: 1 }
+  55% { opacity: 1 }
+  100% { opacity: 0 }
+}
+.mobile-menu-container { position: absolute; z-index: 2; display: none }
+.mobile-menu-image { position: position; z-index: 0; }
+.mobile-menu-container .hotspot { z-index: 3 }
