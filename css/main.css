@@ -1,7 +1,7 @@
 body { margin: 0 }
 .artboard-container { position: relative; margin: 0 auto; display: none }
 .artboard-image { position: relative; z-index: 0; }
-.hotspot { position: absolute; z-index: 1; display: block; padding: 10px; }
+.hotspot { position: absolute; z-index: 1; display: block; padding: 0px; }
 .hotspot.is-visible { border: 1px dotted #ccc; background-color: rgba(0, 0, 0, 0.1); animation: fadeOut 2.5s forwards }
 @keyframes fadeOut {
   0% { opacity: 0 }
