@@ -4,7 +4,7 @@
 
 var buildAlertWindow = function(title, informationText, isOn) {
   var alertWindow = COSAlertWindow.new()
-  alertWindow.addButtonWithTitle("Add")
+  alertWindow.addButtonWithTitle("Set")
   alertWindow.addButtonWithTitle("Remove")
   alertWindow.addButtonWithTitle("Cancel")
   alertWindow.setMessageText(title)

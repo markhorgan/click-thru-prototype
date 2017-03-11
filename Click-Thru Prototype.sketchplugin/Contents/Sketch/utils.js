@@ -125,45 +125,76 @@ Utils.tab = function(count, tabSize) {
   return Utils.repeatStr(count * tabSize)
 }
 
-Utils.getArtboardNameParts = function(artboard, artboards) {
-  for (var i = 0; i < artboards.length; i++) {
-    var itArtboard = artboards[i]
-    var retVals = Utils._getArtboardNameParts(artboard.name(), itArtboard.name())
-    if (retVals != null) {
-      return retVals
+Utils.getArtboardSets = function(artboards) {
+  var artboardSets = new Array()
+  var artboardSetsByBaseName = new Object()
+
+  artboards.forEach(function(artboard){
+    var retVals, suffix = null, baseName
+
+    for (var i = 0; i < artboards.length; i++) {
+      var otherArtboard = artboards[i]
+      retVals = Utils.getArtboardNameParts(artboard, otherArtboard)
+      if (retVals != null) {
+        break
+      }
     }
-  }
-  return null
+
+    if (retVals != null) {
+      // part of a set
+      baseName = retVals[0]
+      suffix = retVals[1]
+      if (suffix.length == 0) {
+        suffix = null
+      }
+      artboardSet = artboardSetsByBaseName[baseName]
+      if (artboardSet == null) {
+        artboardSet = new Array()
+        artboardSets.push(artboardSet)
+        artboardSetsByBaseName[baseName] = artboardSet
+      }
+    } else {
+      // not part of a set
+      baseName = artboard.name()
+      artboardSet = new Array()
+      artboardSets.push(artboardSet)
+    }
+    artboardSet.push({artboard: artboard, baseName: baseName, suffix: suffix})
+  })
+  return artboardSets
 }
 
-Utils._getArtboardNameParts = function(str1, str2) {
-  str1 = String(str1)
-  str2 = String(str2)
-  if (str1 == str2) {
+Utils.getArtboardNameParts = function(artboard1, artboard2) {
+  if (artboard1.frame().width() == artboard2.frame().width()) {
+    return
+  }
+  var name1 = String(artboard1.name())
+  var name2 = String(artboard2.name())
+  if (name1 == name2) {
     return
   }
   var i = 0
   // find where they diverge
-  while (i <= str1.length && i <= str2.length && str1.substring(0, i) == str2.substring(0, i)) {
+  while (i <= name1.length && i <= name2.length && name1.substring(0, i) == name2.substring(0, i)) {
     i++
   }
   if (i > 0) {
     i--
   }
-  if (i < str1.length && i < str2.length) {
+  if (i < name1.length && i < name2.length) {
     // go back to the separator
     var seperatorRegex = /[\s-_]/
-    while (i > 1 && seperatorRegex.test(str1.substr(i - 1, 1))) {
+    while (i > 1 && seperatorRegex.test(name1.substr(i - 1, 1))) {
       i--
     }
   }
-  var baseName = str1.substr(0, i)
-  var suffix = str1.substr(i)
+  var baseName = name1.substr(0, i)
+  var suffix = name1.substr(i)
   if (i > 0 && (suffix.length == 0 || /^[\s-_]+.[^\s-_]+/.test(suffix))) {
-    //log("str1: " + str1 + ", str2: " + str2 + ", baseName:" + baseName + ":, suffix:" + suffix.replace(/^[\s-_]+/, "").trim() + ":")
+    //log("name1: " + name1 + ", name2: " + name2 + ", baseName:" + baseName + ":, suffix:" + suffix.replace(/^[\s-_]+/, "").trim() + ":")
     return [baseName, suffix.replace(/^[\s-_]+/, "").trim()]
   } /* else {
-    log("str1: " + str1 + ", str2: " + str2 + ", baseName:" + baseName + ":, suffix:" + suffix + ": - rejected")
+    log("name1: " + name1 + ", name2: " + name2 + ", baseName:" + baseName + ":, suffix:" + suffix + ": - rejected")
   } */
 }
 

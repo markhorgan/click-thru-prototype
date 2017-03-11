@@ -28,8 +28,6 @@ var getBaseName = function(artboard, artboards, artboardNames) {
 			return baseName
 		}
 	}
-
-
 }
 
 // includeNone: optional, default: true
@@ -37,22 +35,12 @@ var getArtboardNamesInPage = function(page, includeNone) {
 	if (includeNone == null) {
 		includeNone = true
 	}
-	var artboards = page.artboards()
 	var artboardNames = new Array()
-  artboards.forEach(function(artboard) {
-		var retVals = Utils.getArtboardNameParts(artboard, artboards)
-		if (retVals != null) {
-			// part of a set
-			var baseName = retVals[0]
-			if (!artboardNames.includes(baseName)) {
-				artboardNames.push(baseName)
-    	}
-		} else {
-			// not part of a set
-  		artboardNames.push(artboard.name())
-  	}
+	var artboardSets = Utils.getArtboardSets(page.artboards())
+	artboardSets.forEach(function(artboardSet){
+		artboardNames.push(artboardSet[0].baseName)
 	})
-	artboardNames.sort()
+  artboardNames.sort()
   if (includeNone) {
     artboardNames.unshift("None")
   }

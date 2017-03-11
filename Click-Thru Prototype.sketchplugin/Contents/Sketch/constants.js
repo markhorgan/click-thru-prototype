@@ -17,8 +17,8 @@ var Constants = {
   JS_DIRECTORY: "js/"
 }
 
-Constants.KEYS = [Constants.ARTBOARD_LINK, Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE,
-  Constants.DIALOG_TEXT]
+Constants.KEYS = [Constants.ARTBOARD_LINK, Constants.EXTERNAL_LINK, Constants.OPEN_LINK_IN_NEW_WINDOW,
+  Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE, Constants.DIALOG_TEXT]
 
 var ResizingType = {
   STRETCH: 0,
