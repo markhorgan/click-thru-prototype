@@ -15,7 +15,7 @@ var onRun = function(context) {
     return
   }
 
-  var fileURL = Utils.saveFileDialog()
+  var fileURL = UI.saveFileDialog()
   if (fileURL == null) {
     return
   }

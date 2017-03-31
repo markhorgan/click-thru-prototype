@@ -4,7 +4,7 @@
   "author" : "Mark Horgan",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
-  "version" : "1.0.2",
+  "version" : "1.1.0",
   "commands" : [
     {
       "script" : "artboard_link.js",
@@ -25,29 +25,29 @@
       "identifier": "javaScriptDialog"
     },
     {
-      "script" : "export_to_html.js",
-      "handler" : "onRun",
-      "name" : "Export to HTML",
-      "identifier" : "exportToHTML"
-    },
-    {
       "script" : "mobile_menu.js",
       "handler" : "mobileMenuButton",
       "name" : "Set Mobile Menu Button",
       "identifier" : "mobileMenuButton"
     },
     {
-      "script" : "retina_images_setting.js",
-      "handler" : "onRun",
-      "name" : "Retina Images Setting",
-      "identifier" : "retinaImagesSetting"
-    },
-    {
       "script" : "mobile_menu.js",
       "handler" : "mobileMenu",
       "name" : "Set Mobile Menu",
       "identifier" : "mobileMenu"
-    }
+    },
+    {
+      "script" : "settings.js",
+      "handler" : "onRun",
+      "name" : "Settings",
+      "identifier" : "settings"
+    },
+    {
+      "script" : "export_to_html.js",
+      "handler" : "onRun",
+      "name" : "Export to HTML",
+      "identifier" : "exportToHTML"
+    },
   ],
   "menu": {
     "title": "Click-Thru Prototype",
@@ -57,7 +57,7 @@
       "javaScriptDialog",
       "mobileMenuButton",
       "mobileMenu",
-      "retinaImagesSetting",
+      "settings",
       "exportToHTML"
     ]
   }

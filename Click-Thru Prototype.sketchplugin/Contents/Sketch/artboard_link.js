@@ -31,27 +31,27 @@ var getBaseName = function(artboard, artboards, artboardNames) {
 }
 
 // includeNone: optional, default: true
-var getArtboardNamesInPage = function(page, includeNone) {
+var getArtboardNamesInPage = function(page, context, includeNone) {
 	if (includeNone == null) {
 		includeNone = true
 	}
 	var artboardNames = new Array()
-	var artboardSets = Utils.getArtboardSets(page.artboards())
-	artboardSets.forEach(function(artboardSet){
-		artboardNames.push(artboardSet[0].baseName)
+	var artboardGroups = Utils.getArtboardGroups(page.artboards(), context)
+	artboardGroups.forEach(function (artboardGroup) {
+		artboardNames.push(artboardGroup[0].baseName)
 	})
-  artboardNames.sort()
+	artboardNames.sort()
   if (includeNone) {
     artboardNames.unshift("None")
   }
 	return artboardNames
 }
 
-var getArtboardNamesInAllPages = function(document) {
+var getArtboardNamesInAllPages = function(document, context) {
 	var artboardNames = new Array()
 	document.pages().forEach(function(page){
 		if (!Utils.isSymbolsPage(page)) {
-			artboardNames.push.apply(artboardNames, getArtboardNamesInPage(page, false))
+    	artboardNames.push.apply(artboardNames, getArtboardNamesInPage(page, context, false))
 		}
 	})
 	artboardNames.sort()
@@ -85,7 +85,7 @@ var onRun = function(context) {
 		artboardNames = getArtboardNamesInAllPages(doc)
 	} else {
 		// selection in an artboard
-		artboardNames = getArtboardNamesInPage(doc.currentPage())
+		artboardNames = getArtboardNamesInPage(doc.currentPage(), context)
 	}
 	var currentArtboardName = String(Utils.valueForKeyOnLayers(Constants.ARTBOARD_LINK, selection, context, ""))
 	var artboardIndex = getArtboardIndex(currentArtboardName, artboardNames)

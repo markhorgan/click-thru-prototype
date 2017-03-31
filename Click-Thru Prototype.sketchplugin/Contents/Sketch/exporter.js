@@ -2,15 +2,15 @@
 @import "utils.js"
 
 var Exporter = function(outputPath, page, context) {
-  this.outputPath = outputPath
+  this._outputPath = outputPath
   this.page = page
   this.context = context
   this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, 1) == 1
 }
 
 Exporter.prototype.hasMobileMenu = function(){
-  return this.artboardSets.some(function(artboardSet){
-    return artboardSet.some(function(artboardData){
+  return this.artboardGroups.some(function(artboardGroup){
+    return artboardGroup.some(function(artboardData){
       return artboardData.mobileMenuLayer != null
     })
   })
@@ -18,7 +18,7 @@ Exporter.prototype.hasMobileMenu = function(){
 
 Exporter.prototype.generateCSSFile = function() {
   var fileManager = NSFileManager.defaultManager()
-  var path = this.outputPath + "/" + Constants.CSS_DIRECTORY
+  var path = this._outputPath + "/" + Constants.CSS_DIRECTORY
   if (!fileManager.fileExistsAtPath(path)) {
     fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(path, false, null, null)
   }
@@ -46,7 +46,7 @@ Exporter.prototype.generateCSSFile = function() {
 
 Exporter.prototype.generateJSFile = function(){
   var fileManager = NSFileManager.defaultManager()
-  var jsPath = this.outputPath + "/" + Constants.JS_DIRECTORY
+  var jsPath = this._outputPath + "/" + Constants.JS_DIRECTORY
   var filename = "main.js"
   var targetPath = jsPath + filename
   var error = MOPointer.alloc().init()
@@ -392,7 +392,7 @@ Exporter.prototype.generateHTMLFile = function(artboardSet) {
   html += '</main>\n</body>\n</html>\n'
 
   var filename = Utils.toFilename(artboardSet[0].baseName) + ".html"
-  var filePath = this.outputPath + "/" + filename
+  var filePath = this._outputPath + "/" + filename
   Utils.writeToFile(html, filePath)
 }
 
@@ -429,7 +429,7 @@ Exporter.prototype.exportImage = function(layer, scale, imagePath) {
 }
 
 Exporter.prototype.exportImages = function(artboardSet) {
-  var imagesPath = this.outputPath + "/" + Constants.IMAGES_DIRECTORY
+  var imagesPath = this._outputPath + "/" + Constants.IMAGES_DIRECTORY
   artboardSet.forEach(function(artboardData){
     var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
@@ -455,44 +455,39 @@ Exporter.prototype.exportImages = function(artboardSet) {
   }, this)
 }
 
-Exporter.prototype.getArtboardSets = function(){
-  var artboardSets = Utils.getArtboardSets(this.page.artboards())
+Exporter.prototype.getArtboardGroups = function(){
+  var artboardGroups = Utils.getArtboardGroups(this.page.artboards(), this.context)
 
-  artboardSets.forEach(function(artboardSet){
-    // set mobile menu layer
-    artboardSet.forEach(function(artboardData) {
+  artboardGroups.forEach(function (artboardGroup) {
+    // set mobile menu sLayer
+    artboardGroup.forEach(function (artboardData) {
       artboardData.mobileMenuLayer = this.findLayer(Constants.IS_MOBILE_MENU, artboardData.artboard)
     }, this)
 
-    // sort artboards within a set by width
-    artboardSet.sort(function(a, b){
-      if (a.artboard.frame().width() < b.artboard.frame().width()) {
-        return 1
-      } else if (a.artboard.frame().width() > b.artboard.frame().width()) {
-        return -1
-      } else {
-        return 0
-      }
-    })
+    if (Utils.hasResponsiveArtboards(this.context)) {
+      // sort artboards within a set by width
+      artboardGroup.sort(function (a, b) {
+        if (a.artboard.frame().width() < b.artboard.frame().width()) {
+          return 1
+        } else if (a.artboard.frame().width() > b.artboard.frame().width()) {
+          return -1
+        } else {
+          return 0
+        }
+      })
+    }
   }, this)
-
-  /*artboardSets.forEach(function(artboardSet){
-    artboardSet.forEach(function(artboardData){
-      log("artboard: " + artboardData.artboard.name() + ", suffix:" + artboardData.suffix)
-    })
-  })*/
-
-  return artboardSets
+  return artboardGroups
 }
 
 Exporter.prototype.exportArtboards = function () {
-  this.artboardSets = this.getArtboardSets()
+  this.artboardGroups = this.getArtboardGroups()
 
   this.generateCSSFile()
   this.generateJSFile()
 
-  this.artboardSets.forEach(function(artboardSet) {
-    this.exportImages(artboardSet)
-    this.generateHTMLFile(artboardSet)
+  this.artboardGroups.forEach(function(artboardGroup) {
+    this.exportImages(artboardGroup)
+    this.generateHTMLFile(artboardGroup)
   }, this)
 }

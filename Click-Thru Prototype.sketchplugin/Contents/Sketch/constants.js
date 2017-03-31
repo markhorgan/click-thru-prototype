@@ -9,6 +9,7 @@ var Constants = {
   DIALOG_TYPE_ALERT: "alert",
   DIALOG_TYPE_CONFIRM: "confirm",
   RETINA_IMAGES: "retinaImages",
+  RESPONSIVE_ARTBOARDS: "responsiveArtboards",
   TAB_SIZE: 2,
   HOTSPOT_PADDING: 0,
   LAYER_LOGGING: false,

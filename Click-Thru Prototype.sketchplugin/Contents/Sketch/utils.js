@@ -15,23 +15,6 @@ Utils.colorToHex = function (color) {
   return "#" + ("0" + red.toString(16)).slice(-2) + ("0" + green.toString(16)).slice(-2) + ("0" + blue.toString(16)).slice(-2)
 }
 
-Utils.saveFileDialog = function() {
-  var openPanel = NSOpenPanel.openPanel()
-  openPanel.setTitle("Chooce a location...")
-  openPanel.setPrompt("Export")
-  openPanel.setCanChooseDirectories(true)
-  openPanel.setCanCreateDirectories(true)
-  openPanel.setCanChooseFiles(false)
-  openPanel.setAllowsMultipleSelection(false)
-  openPanel.setShowsHiddenFiles(false)
-  openPanel.setExtensionHidden(false)
-  var buttonPressed = openPanel.runModal()
-  if (buttonPressed == NSFileHandlingPanelOKButton) {
-    return openPanel.URL()
-  }
-  return null
-}
-
 // dasherize: optional, default: true
 Utils.toFilename = function(name, dasherize) {
   if (dasherize == null) {
@@ -72,7 +55,7 @@ var _deleteFromArtboard = function(layer, ignoreLayer, key, context) {
   }
 }
 
-// exclusiveOnLayer: optional, default: true - deletes other values on the layer
+// exclusiveOnLayer: optional, default: true - deletes other values on the sLayer
 // exclusiveOnArtboard: optional, default: false - deletes same value on other layers in the artboard
 Utils.setValueOnLayers = function(value, key, selection, context, exclusiveOnLayer, exclusiveOnArtboard) {
   if (exclusiveOnLayer == null) {
@@ -106,6 +89,10 @@ Utils.setValueOnDocument = function(value, key, context) {
   context.command.setValue_forKey_onDocument_forPluginIdentifier(value, key, context.document.documentData(), context.plugin.identifier())
 }
 
+Utils.hasResponsiveArtboards = function(context) {
+  return Utils.valueForKeyOnDocument(Constants.RESPONSIVE_ARTBOARDS, context, 1) == 1
+}
+
 // str: optional, default: " "
 Utils.repeatStr = function(count, str) {
   if (str == null) {
@@ -125,43 +112,49 @@ Utils.tab = function(count, tabSize) {
   return Utils.repeatStr(count * tabSize)
 }
 
-Utils.getArtboardSets = function(artboards) {
-  var artboardSets = new Array()
-  var artboardSetsByBaseName = new Object()
+Utils.getArtboardGroups = function(artboards, context) {
+  var artboardGroups = new Array()
+  if (Utils.hasResponsiveArtboards(context)) {
+    var artboardGroupsByBaseName = new Object()
 
-  artboards.forEach(function(artboard){
-    var retVals, suffix = null, baseName
+    artboards.forEach(function (artboard) {
+      var retVals, suffix = null, baseName, artboardGroup
 
-    for (var i = 0; i < artboards.length; i++) {
-      var otherArtboard = artboards[i]
-      retVals = Utils.getArtboardNameParts(artboard, otherArtboard)
+      for (var i = 0; i < artboards.length; i++) {
+        var otherArtboard = artboards[i]
+        retVals = Utils.getArtboardNameParts(artboard, otherArtboard)
+        if (retVals != null) {
+          break
+        }
+      }
+
       if (retVals != null) {
-        break
+        // part of a set
+        baseName = retVals[0]
+        suffix = retVals[1]
+        if (suffix.length == 0) {
+          suffix = null
+        }
+        artboardGroup = artboardGroupsByBaseName[baseName]
+        if (artboardGroup == null) {
+          artboardGroup = new Array()
+          artboardGroups.push(artboardGroup)
+          artboardGroupsByBaseName[baseName] = artboardGroup
+        }
+      } else {
+        // not part of a set
+        baseName = artboard.name()
+        artboardGroup = new Array()
+        artboardGroups.push(artboardGroup)
       }
-    }
-
-    if (retVals != null) {
-      // part of a set
-      baseName = retVals[0]
-      suffix = retVals[1]
-      if (suffix.length == 0) {
-        suffix = null
-      }
-      artboardSet = artboardSetsByBaseName[baseName]
-      if (artboardSet == null) {
-        artboardSet = new Array()
-        artboardSets.push(artboardSet)
-        artboardSetsByBaseName[baseName] = artboardSet
-      }
-    } else {
-      // not part of a set
-      baseName = artboard.name()
-      artboardSet = new Array()
-      artboardSets.push(artboardSet)
-    }
-    artboardSet.push({artboard: artboard, baseName: baseName, suffix: suffix})
-  })
-  return artboardSets
+      artboardGroup.push({artboard: artboard, baseName: baseName, suffix: suffix})
+    })
+  } else {
+    artboards.forEach(function(artboard){
+      artboardGroups.push([{artboard: artboard, baseName: artboard.name()}])
+    })
+  }
+  return artboardGroups
 }
 
 Utils.getArtboardNameParts = function(artboard1, artboard2) {

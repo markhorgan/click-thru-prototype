@@ -11,6 +11,17 @@ UI.buildLabel = function(text, fontSize, frame) {
   return label
 }
 
+UI.buildHint = function(text, fontSize, frame) {
+  var label = NSTextField.alloc().initWithFrame(frame)
+  label.setStringValue(text)
+  label.setFont(NSFont.systemFontOfSize(fontSize))
+  label.setBezeled(false)
+  label.setDrawsBackground(false)
+  label.setEditable(false)
+  label.setSelectable(false)
+  return label
+}
+
 // placeholder: optional
 UI.buildTextField = function(text, frame, placeholder) {
   var textField = NSTextField.alloc().initWithFrame(frame)
@@ -79,4 +90,21 @@ UI.displayDialog = function(text, title) {
     title = "Notice"
   }
   NSApplication.sharedApplication().displayDialog_withTitle(text, title)
+}
+
+UI.saveFileDialog = function() {
+  var openPanel = NSOpenPanel.openPanel()
+  openPanel.setTitle("Chooce a location...")
+  openPanel.setPrompt("Export")
+  openPanel.setCanChooseDirectories(true)
+  openPanel.setCanCreateDirectories(true)
+  openPanel.setCanChooseFiles(false)
+  openPanel.setAllowsMultipleSelection(false)
+  openPanel.setShowsHiddenFiles(false)
+  openPanel.setExtensionHidden(false)
+  var buttonPressed = openPanel.runModal()
+  if (buttonPressed == NSFileHandlingPanelOKButton) {
+    return openPanel.URL()
+  }
+  return null
 }
