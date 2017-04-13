@@ -194,3 +194,16 @@ Utils.getArtboardNameParts = function(artboard1, artboard2) {
 Utils.isSymbolsPage = function(page) {
   return page.artboards()[0].isKindOfClass(MSSymbolMaster)
 }
+
+Utils.removeFilesWithExtension = function(path, extension) {
+  var error = MOPointer.alloc().init()
+  var fileManager = NSFileManager.defaultManager()
+  var files = fileManager.contentsOfDirectoryAtPath_error(path, null)
+  files.forEach(function(file) {
+    if (file.pathExtension() == extension) {
+      if (!fileManager.removeItemAtPath_error(path + "/" + file, error)) {
+        log(error.value().localizedDescription())
+      }
+    }
+  })
+}

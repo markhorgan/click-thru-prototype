@@ -13,6 +13,7 @@ var Constants = {
   TAB_SIZE: 2,
   HOTSPOT_PADDING: 0,
   LAYER_LOGGING: false,
+  OUTPUT_DIRECTORY: "prototype",
   IMAGES_DIRECTORY: "images/",
   CSS_DIRECTORY: "css/",
   JS_DIRECTORY: "js/"

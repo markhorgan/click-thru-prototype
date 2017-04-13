@@ -97,7 +97,6 @@ UI.saveFileDialog = function() {
   openPanel.setTitle("Chooce a location...")
   openPanel.setPrompt("Export")
   openPanel.setCanChooseDirectories(true)
-  openPanel.setCanCreateDirectories(true)
   openPanel.setCanChooseFiles(false)
   openPanel.setAllowsMultipleSelection(false)
   openPanel.setShowsHiddenFiles(false)

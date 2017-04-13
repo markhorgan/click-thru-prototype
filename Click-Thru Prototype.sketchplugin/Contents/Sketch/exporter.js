@@ -1,8 +1,8 @@
 @import "constants.js"
 @import "utils.js"
 
-var Exporter = function(outputPath, page, context) {
-  this._outputPath = outputPath
+var Exporter = function(selectedPath, page, context) {
+  this._outputPath = this.createOutputPath(selectedPath)
   this.page = page
   this.context = context
   this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, 1) == 1
@@ -429,7 +429,19 @@ Exporter.prototype.exportImage = function(layer, scale, imagePath) {
 }
 
 Exporter.prototype.exportImages = function(artboardSet) {
+  var error
   var imagesPath = this._outputPath + "/" + Constants.IMAGES_DIRECTORY
+  var fileManager = NSFileManager.defaultManager()
+
+  if (!fileManager.fileExistsAtPath(imagesPath)) {
+    error = MOPointer.alloc().init()
+    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(imagesPath, false, null, error)) {
+      log(error.value().localizedDescription())
+    }
+  } else {
+    Utils.removeFilesWithExtension(imagesPath, "png")
+  }
+
   artboardSet.forEach(function(artboardData){
     var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
@@ -490,4 +502,19 @@ Exporter.prototype.exportArtboards = function () {
     this.exportImages(artboardGroup)
     this.generateHTMLFile(artboardGroup)
   }, this)
+}
+
+Exporter.prototype.createOutputPath = function(selectedPath) {
+  var error
+  var fileManager = NSFileManager.defaultManager()
+  var outputPath = selectedPath + "/" + Constants.OUTPUT_DIRECTORY
+  if (!fileManager.fileExistsAtPath(outputPath)) {
+    error = MOPointer.alloc().init()
+    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(outputPath, false, null, error)) {
+      log(error.value().localizedDescription())
+    }
+  } else {
+    Utils.removeFilesWithExtension(outputPath, "html")
+  }
+  return outputPath
 }
