@@ -494,8 +494,8 @@ Exporter.prototype.exportArtboards = function () {
 Exporter.prototype.prepareOutputFolder = function(selectedPath) {
   var error
   var fileManager = NSFileManager.defaultManager()
-  this._outputPath = selectedPath + "/" + Constants.OUTPUT_DIRECTORY
 
+  this._outputPath = selectedPath + "/" + Constants.OUTPUT_DIRECTORY
   if (!fileManager.fileExistsAtPath(this._outputPath)) {
     error = MOPointer.alloc().init()
     if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this._outputPath, false, null, error)) {
