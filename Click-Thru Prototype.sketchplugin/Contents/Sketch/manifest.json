@@ -2,9 +2,12 @@
   "name": "Click-Thru Prototype",
   "description": "Generates a HTML click-through prototype of your responsive website design",
   "author" : "Mark Horgan",
+  "homepage": "https://github.com/markhorgan/click-thru-prototype",
+  "updateURL": "https://github.com/markhorgan/click-thru-prototype/archive/master.zip",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
-  "version" : "1.1.1",
+  "bundleVersion": 1,
+  "version" : "1.1.2",
   "commands" : [
     {
       "script" : "artboard_link.js",

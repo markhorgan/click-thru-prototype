@@ -2,7 +2,7 @@
 @import "utils.js"
 
 var Exporter = function(selectedPath, page, context) {
-  this._outputPath = this.createOutputPath(selectedPath)
+  this.prepareOutputFolder(selectedPath)
   this.page = page
   this.context = context
   this.retinaImages = Utils.valueForKeyOnDocument(Constants.RETINA_IMAGES, context, 1) == 1
@@ -428,37 +428,24 @@ Exporter.prototype.exportImage = function(layer, scale, imagePath) {
   this.context.document.saveArtboardOrSlice_toFile(slice, imagePath)
 }
 
-Exporter.prototype.exportImages = function(artboardSet) {
-  var error
-  var imagesPath = this._outputPath + "/" + Constants.IMAGES_DIRECTORY
-  var fileManager = NSFileManager.defaultManager()
-
-  if (!fileManager.fileExistsAtPath(imagesPath)) {
-    error = MOPointer.alloc().init()
-    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(imagesPath, false, null, error)) {
-      log(error.value().localizedDescription())
-    }
-  } else {
-    Utils.removeFilesWithExtension(imagesPath, "png")
-  }
-
-  artboardSet.forEach(function(artboardData){
+Exporter.prototype.exportImages = function(artboardGroup) {
+  artboardGroup.forEach(function(artboardData){
     var mobileMenuLayer = artboardData.mobileMenuLayer
     var mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible()
     if (mobileMenuLayerIsVisible) {
       mobileMenuLayer.setIsVisible(false)
     }
 
-    this.exportImage(artboardData.artboard, 1, imagesPath + this.getArtboardImageName(artboardData.artboard, 1))
+    this.exportImage(artboardData.artboard, 1, this._imagesPath + this.getArtboardImageName(artboardData.artboard, 1))
     if (this.retinaImages) {
-      this.exportImage(artboardData.artboard, 2, imagesPath + this.getArtboardImageName(artboardData.artboard, 2))
+      this.exportImage(artboardData.artboard, 2, this._imagesPath + this.getArtboardImageName(artboardData.artboard, 2))
     }
 
     if (mobileMenuLayer != null) {
       mobileMenuLayer.setIsVisible(true)
-      this.exportImage(mobileMenuLayer, 1, imagesPath + this.getMobileMenuImageName(artboardData.artboard, 1))
+      this.exportImage(mobileMenuLayer, 1, this._imagesPath + this.getMobileMenuImageName(artboardData.artboard, 1))
       if (this.retinaImages) {
-        this.exportImage(mobileMenuLayer, 2, imagesPath + this.getMobileMenuImageName(artboardData.artboard, 2))
+        this.exportImage(mobileMenuLayer, 2, this._imagesPath + this.getMobileMenuImageName(artboardData.artboard, 2))
       }
       if (!mobileMenuLayerIsVisible) {
         mobileMenuLayer.setIsVisible(false)
@@ -504,17 +491,27 @@ Exporter.prototype.exportArtboards = function () {
   }, this)
 }
 
-Exporter.prototype.createOutputPath = function(selectedPath) {
+Exporter.prototype.prepareOutputFolder = function(selectedPath) {
   var error
   var fileManager = NSFileManager.defaultManager()
-  var outputPath = selectedPath + "/" + Constants.OUTPUT_DIRECTORY
-  if (!fileManager.fileExistsAtPath(outputPath)) {
+  this._outputPath = selectedPath + "/" + Constants.OUTPUT_DIRECTORY
+
+  if (!fileManager.fileExistsAtPath(this._outputPath)) {
     error = MOPointer.alloc().init()
-    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(outputPath, false, null, error)) {
+    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this._outputPath, false, null, error)) {
       log(error.value().localizedDescription())
     }
   } else {
-    Utils.removeFilesWithExtension(outputPath, "html")
+    Utils.removeFilesWithExtension(this._outputPath, "html")
   }
-  return outputPath
+
+  this._imagesPath = this._outputPath + "/" + Constants.IMAGES_DIRECTORY
+  if (!fileManager.fileExistsAtPath(this._imagesPath)) {
+    error = MOPointer.alloc().init()
+    if (!fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(this._imagesPath, false, null, error)) {
+      log(error.value().localizedDescription())
+    }
+  } else {
+    Utils.removeFilesWithExtension(this._imagesPath, "png")
+  }
 }
