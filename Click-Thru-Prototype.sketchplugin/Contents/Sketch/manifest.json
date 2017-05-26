@@ -4,10 +4,11 @@
   "author" : "Mark Horgan",
   "homepage": "https://github.com/markhorgan/click-thru-prototype",
   "updateURL": "https://github.com/markhorgan/click-thru-prototype/archive/master.zip",
+  "appcast": "https://github.com/markhorgan/click-thru-prototype/blob/master/appcast.xml",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
   "bundleVersion": 1,
-  "version" : "1.1.3",
+  "version" : "1.1.4",
   "commands" : [
     {
       "script" : "artboard_link.js",
