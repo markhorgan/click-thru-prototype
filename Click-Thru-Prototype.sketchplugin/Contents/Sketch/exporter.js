@@ -1,5 +1,6 @@
 @import "constants.js"
 @import "utils.js"
+@import "resizing_constraint.js"
 
 var Exporter = function(selectedPath, page, context) {
   this.prepareOutputFolder(selectedPath)
@@ -79,58 +80,110 @@ Exporter.prototype.getAbsoluteRect = function(layer, parentAbsoluteRect, indent)
       returnRect = NSMakeRect(0, 0, layer.absoluteRect().width(), layer.absoluteRect().height())
     }
   } else if (parentAbsoluteRect != null) {
-    switch (layer.resizingType()) {
-      case ResizingType.STRETCH:
-        var parentLayer = layer.parentForInsertingLayers()
-        var horzScale = parentAbsoluteRect.size.width / parentLayer.frame().width()
-        var vertScale = parentAbsoluteRect.size.height / parentLayer.frame().height()
-        x = parentAbsoluteRect.origin.x + (layer.frame().x() * horzScale)
-        y = parentAbsoluteRect.origin.y + (layer.frame().y() * vertScale)
-        var width = layer.frame().width() * horzScale
-        var height = layer.frame().height() * vertScale
-        returnRect = NSMakeRect(x, y, width, height)
-        if (Constants.LAYER_LOGGING) {
-          log(Utils.tab(indent, 1) + layer.name() + ": " + layer.class() + "," + layer.isKindOfClass(MSArtboardGroup) + "," + layer.resizingType() + ",scale:" + horzScale + "," + vertScale + ",(" + Math.round(returnRect.origin.x) + "," + Math.round(returnRect.origin.y) + "," + Math.round(returnRect.size.width) + "," + Math.round(returnRect.size.height) + ")")
+    var parentLayer = layer.parentForInsertingLayers()
+    if (layer.resizingConstraint !== undefined) {
+      // Sketch >= 44
+      returnRect = NSMakeRect(parentAbsoluteRect.origin.x + layer.frame().x(), parentAbsoluteRect.origin.y + layer.frame().y(), layer.frame().width(), layer.frame().height())
+      if (parentLayer.frame().width() !== parentAbsoluteRect.size.width && parentLayer.frame().height() !== parentAbsoluteRect.size.height) {
+        var resizingConstraint = 63 ^ layer.resizingConstraint()
+        var frame = layer.frame()
+        var parentFrame = parentLayer.frame()
+
+        if ((resizingConstraint & ResizingConstraint.LEFT) === ResizingConstraint.LEFT) {
+          if ((resizingConstraint & ResizingConstraint.RIGHT) === ResizingConstraint.RIGHT) {
+            var rightDistance = parentFrame.width() - frame.x() - frame.width()
+            var width = parentAbsoluteRect.size.width - frame.x - rightDistance;
+            returnRect.size.width = width < 1 ? 1 : width;
+          } else if ((resizingConstraint & ResizingConstraint.WIDTH) !== ResizingConstraint.WIDTH) {
+            returnRect.size.width = (frame.width / parentFrame.width) * parentAbsoluteRect.size.width
+          }
+        } else if ((resizingConstraint & ResizingConstraint.RIGHT) === ResizingConstraint.RIGHT) {
+          if ((resizingConstraint & ResizingConstraint.WIDTH) === ResizingConstraint.WIDTH) {
+            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - frame.width())
+          } else {
+            returnRect.size.width = (frame.width() / parentFrame.width()) * parentAbsoluteRect.size.width
+            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - returnRect.size.width)
+          }
+        } else {
+          if ((resizingConstraint & ResizingConstraint.WIDTH) === ResizingConstraint.WIDTH) {
+            returnRect.origin.x = parentAbsoluteRect.origin.x + ((((frame.x() + frame.width() / 2.0) / parentFrame.width()) * parentAbsoluteRect.size.width) - (frame.width() / 2.0))
+          } else {
+            returnRect.origin.x = parentAbsoluteRect.origin.x + ((frame.x() / parentFrame.width()) * parentAbsoluteRect.size.width);
+            returnRect.size.width = (frame.width() / parentFrame.width()) * parentAbsoluteRect.size.width;
+          }
         }
-        return returnRect
 
-      case ResizingType.PIN_TO_CORNER:
-        var parentLayer = layer.parentForInsertingLayers()
-        var leftDistance =  layer.frame().x()
-        var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
-        x = leftDistance < rightDistance ? parentAbsoluteRect.origin.x + leftDistance : (parentAbsoluteRect.origin.x +
-          parentAbsoluteRect.size.width) - rightDistance - layer.frame().width()
-        var topDistance = layer.frame().y()
-        var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
-        y = topDistance < bottomDistance ? parentAbsoluteRect.origin.y + topDistance : (parentAbsoluteRect.origin.y +
-          parentAbsoluteRect.size.height) - bottomDistance - layer.frame().height()
-        returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
-        break
+        if ((resizingConstraint & ResizingConstraint.TOP) === ResizingConstraint.TOP) {
+          if ((resizingConstraint & ResizingConstraint.BOTTOM) === ResizingConstraint.BOTTOM) {
+            var bottomDistance = parentAbsoluteRect.size.height - frame.y() - frame.height()
+            var height = parentAbsoluteRect.size.height - frame.y() - bottomDistance;
+            returnRect.size.height = height < 1 ? 1 : height;
+          } else if ((resizingConstraint & ResizingConstraint.HEIGHT) !== ResizingConstraint.HEIGHT) {
+            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.height()
+          }
+        } else if ((resizingConstraint & ResizingConstraint.BOTTOM) === ResizingConstraint.BOTTOM) {
+          if ((resizingConstraint & ResizingConstraint.HEIGHT) == ResizingConstraint.HEIGHT) {
+            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - frame.height())
+          } else {
+            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.size.height
+            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - returnRect.size.height)
+          }
+        } else {
+          if ((resizingConstraint & ResizingConstraint.HEIGHT) === ResizingConstraint.HEIGHT) {
+            returnRect.origin.y = parentAbsoluteRect.origin.y + ((((frame.y() + frame.height() / 2.0) / parentFrame.height()) * parentAbsoluteRect.size.height) - (frame.height() / 2.0))
+          } else {
+            returnRect.origin.y = parentAbsoluteRect.origin.y + ((frame.y() / parentFrame.height()) * parentAbsoluteRect.size.height)
+            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.size.height
+          }
+        }
+      }
+    } else if (layer.resizingType !== undefined) {
+      // Sketch < 44
+      switch (layer.resizingType()) {
+        case ResizingType.STRETCH:
+          var horzScale = parentAbsoluteRect.size.width / parentLayer.frame().width()
+          var vertScale = parentAbsoluteRect.size.height / parentLayer.frame().height()
+          x = parentAbsoluteRect.origin.x + (layer.frame().x() * horzScale)
+          y = parentAbsoluteRect.origin.y + (layer.frame().y() * vertScale)
+          var width = layer.frame().width() * horzScale
+          var height = layer.frame().height() * vertScale
+          returnRect = NSMakeRect(x, y, width, height)
+          return returnRect
 
-      case ResizingType.RESIZE_OBJECT:
-        var parentLayer = layer.parentForInsertingLayers()
-        var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
-        var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
-        returnRect = NSMakeRect(parentAbsoluteRect.origin.x + layer.frame().x(),  parentAbsoluteRect.origin.y + layer.frame().y(),
-          parentAbsoluteRect.size.width - layer.frame().x() - rightDistance, parentAbsoluteRect.size.height - layer.frame().y() - bottomDistance)
-        break
+        case ResizingType.PIN_TO_CORNER:
+          var leftDistance =  layer.frame().x()
+          var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
+          x = leftDistance < rightDistance ? parentAbsoluteRect.origin.x + leftDistance : (parentAbsoluteRect.origin.x +
+              parentAbsoluteRect.size.width) - rightDistance - layer.frame().width()
+          var topDistance = layer.frame().y()
+          var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
+          y = topDistance < bottomDistance ? parentAbsoluteRect.origin.y + topDistance : (parentAbsoluteRect.origin.y +
+              parentAbsoluteRect.size.height) - bottomDistance - layer.frame().height()
+          returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
+          break
 
-      case ResizingType.FLOAT_IN_PLACE:
-        var parentLayer = layer.parentForInsertingLayers()
+        case ResizingType.RESIZE_OBJECT:
+          var rightDistance = parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())
+          var bottomDistance = parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())
+          returnRect = NSMakeRect(parentAbsoluteRect.origin.x + layer.frame().x(),  parentAbsoluteRect.origin.y + layer.frame().y(),
+              parentAbsoluteRect.size.width - layer.frame().x() - rightDistance, parentAbsoluteRect.size.height - layer.frame().y() - bottomDistance)
+          break
 
-        var unscaledLeftoverHorzSpace = parentLayer.frame().width() - layer.frame().width()
-        var leftSpaceFraction = layer.frame().x() / unscaledLeftoverHorzSpace
-        var rightSpaceFraction = (parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())) / unscaledLeftoverHorzSpace
-        var leftoverHorzSpace = parentAbsoluteRect.size.width - layer.frame().width()
-        x = (((leftSpaceFraction * leftoverHorzSpace) + (parentAbsoluteRect.size.width - (rightSpaceFraction * leftoverHorzSpace))) / 2) + parentAbsoluteRect.origin.x - (layer.frame().width() / 2)
+        case ResizingType.FLOAT_IN_PLACE:
+          var unscaledLeftoverHorzSpace = parentLayer.frame().width() - layer.frame().width()
+          var leftSpaceFraction = layer.frame().x() / unscaledLeftoverHorzSpace
+          var rightSpaceFraction = (parentLayer.frame().width() - (layer.frame().x() + layer.frame().width())) / unscaledLeftoverHorzSpace
+          var leftoverHorzSpace = parentAbsoluteRect.size.width - layer.frame().width()
+          x = (((leftSpaceFraction * leftoverHorzSpace) + (parentAbsoluteRect.size.width - (rightSpaceFraction * leftoverHorzSpace))) / 2) + parentAbsoluteRect.origin.x - (layer.frame().width() / 2)
 
-        var unscaledLeftoverVertSpace = parentLayer.frame().height() - layer.frame().height()
-        var topSpaceFraction = layer.frame().y() / unscaledLeftoverVertSpace
-        var bottomSpaceFraction = (parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())) / unscaledLeftoverVertSpace
-        var leftoverVertSpace = parentAbsoluteRect.size.height - layer.frame().height()
-        y = (((topSpaceFraction * leftoverVertSpace) + (parentAbsoluteRect.size.height - (bottomSpaceFraction * leftoverVertSpace))) / 2) +  parentAbsoluteRect.origin.y - (layer.frame().height() / 2)
-        returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
-        break
+          var unscaledLeftoverVertSpace = parentLayer.frame().height() - layer.frame().height()
+          var topSpaceFraction = layer.frame().y() / unscaledLeftoverVertSpace
+          var bottomSpaceFraction = (parentLayer.frame().height() - (layer.frame().y() + layer.frame().height())) / unscaledLeftoverVertSpace
+          var leftoverVertSpace = parentAbsoluteRect.size.height - layer.frame().height()
+          y = (((topSpaceFraction * leftoverVertSpace) + (parentAbsoluteRect.size.height - (bottomSpaceFraction * leftoverVertSpace))) / 2) +  parentAbsoluteRect.origin.y - (layer.frame().height() / 2)
+          returnRect = NSMakeRect(x, y, layer.frame().width(), layer.frame().height())
+          break
+      }
     }
   } else {
     // mobile menu layer
@@ -375,7 +428,7 @@ Exporter.prototype.hasMobileMenuLayer = function(artboardSet) {
 
 Exporter.prototype.generateHTMLFile = function(artboardSet) {
   var mainArtboard = artboardSet[0].artboard
-  var html = '<!DOCTYPE html>\n<head>\n' +
+  var html = '<!DOCTYPE html>\n<html>\n<head>\n' +
     '<title>'+mainArtboard.name()+'</title>\n' +
     '<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />\n' +
     '<link href="css/main.css" rel="stylesheet" type="text/css"/>\n'

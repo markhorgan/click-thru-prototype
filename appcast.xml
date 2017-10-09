@@ -6,16 +6,15 @@
         <description>Create click-through prototypes within Sketch</description>
         <language>en</language>
         <item>
-            <title>Version 1.1.4</title>
+            <title>Version 1.1.5</title>
             <description>
                 <![CDATA[
                     <ul>
-                        <li>Added support for Sketch's plugin update system</li>
+                        <li>Added support for Sketch's resizing constraints</li>
                     </ul>
                 ]]>
             </description>
-            <pubDate>Fri, 26 May 2017 13:19:00 +0100</pubDate>
-            <enclosure url="https://github.com/markhorgan/click-thru-prototype/archive/master.zip" sparkle:version="1.1.4" type="application/octet-stream" />
+            <enclosure url="https://github.com/markhorgan/click-thru-prototype/archive/master.zip" sparkle:version="1.1.5"/>
         </item>
     </channel>
 </rss>
