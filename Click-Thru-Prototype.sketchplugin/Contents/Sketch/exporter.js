@@ -91,22 +91,23 @@ Exporter.prototype.getAbsoluteRect = function(layer, parentAbsoluteRect, indent)
 
         if ((resizingConstraint & ResizingConstraint.LEFT) === ResizingConstraint.LEFT) {
           if ((resizingConstraint & ResizingConstraint.RIGHT) === ResizingConstraint.RIGHT) {
-            var rightDistance = parentFrame.width() - frame.x() - frame.width()
-            var width = parentAbsoluteRect.size.width - frame.x - rightDistance;
+            const rightDistance = parentFrame.width() - frame.x() - frame.width();
+            const width = parentAbsoluteRect.size.width - frame.x() - rightDistance;
             returnRect.size.width = width < 1 ? 1 : width;
           } else if ((resizingConstraint & ResizingConstraint.WIDTH) !== ResizingConstraint.WIDTH) {
-            returnRect.size.width = (frame.width / parentFrame.width) * parentAbsoluteRect.size.width
+            returnRect.size.width = (frame.width() / (parentFrame.width() - frame.x())) * (parentAbsoluteRect.size.width - frame.x());
           }
         } else if ((resizingConstraint & ResizingConstraint.RIGHT) === ResizingConstraint.RIGHT) {
           if ((resizingConstraint & ResizingConstraint.WIDTH) === ResizingConstraint.WIDTH) {
-            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - frame.width())
+            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - frame.width());
           } else {
-            returnRect.size.width = (frame.width() / parentFrame.width()) * parentAbsoluteRect.size.width
-            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - returnRect.size.width)
+            const rightDistance = parentFrame.width() - frame.x() - frame.width();
+            returnRect.size.width = (frame.width() / (parentFrame.width() - rightDistance)) * (parentAbsoluteRect.size.width - rightDistance);
+            returnRect.origin.x = parentAbsoluteRect.origin.x + (parentAbsoluteRect.size.width - (parentFrame.width() - (frame.x() + frame.width())) - returnRect.size.width);
           }
         } else {
           if ((resizingConstraint & ResizingConstraint.WIDTH) === ResizingConstraint.WIDTH) {
-            returnRect.origin.x = parentAbsoluteRect.origin.x + ((((frame.x() + frame.width() / 2.0) / parentFrame.width()) * parentAbsoluteRect.size.width) - (frame.width() / 2.0))
+            returnRect.origin.x = parentAbsoluteRect.origin.x + ((((frame.x() + frame.width() / 2.0) / parentFrame.width()) * parentAbsoluteRect.size.width) - (frame.width() / 2.0));
           } else {
             returnRect.origin.x = parentAbsoluteRect.origin.x + ((frame.x() / parentFrame.width()) * parentAbsoluteRect.size.width);
             returnRect.size.width = (frame.width() / parentFrame.width()) * parentAbsoluteRect.size.width;
@@ -115,25 +116,26 @@ Exporter.prototype.getAbsoluteRect = function(layer, parentAbsoluteRect, indent)
 
         if ((resizingConstraint & ResizingConstraint.TOP) === ResizingConstraint.TOP) {
           if ((resizingConstraint & ResizingConstraint.BOTTOM) === ResizingConstraint.BOTTOM) {
-            var bottomDistance = parentAbsoluteRect.size.height - frame.y() - frame.height()
-            var height = parentAbsoluteRect.size.height - frame.y() - bottomDistance;
+            const bottomDistance = parentAbsoluteRect.size.height - frame.y() - frame.height();
+            const height = parentAbsoluteRect.size.height - frame.y() - bottomDistance;
             returnRect.size.height = height < 1 ? 1 : height;
           } else if ((resizingConstraint & ResizingConstraint.HEIGHT) !== ResizingConstraint.HEIGHT) {
-            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.height()
+            returnRect.size.height = (frame.height() / (parentFrame.height() - frame.y())) * (parentAbsoluteRect.height() - frame.y());
           }
         } else if ((resizingConstraint & ResizingConstraint.BOTTOM) === ResizingConstraint.BOTTOM) {
-          if ((resizingConstraint & ResizingConstraint.HEIGHT) == ResizingConstraint.HEIGHT) {
-            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - frame.height())
+          if ((resizingConstraint & ResizingConstraint.HEIGHT) === ResizingConstraint.HEIGHT) {
+            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - frame.height());
           } else {
-            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.size.height
-            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - returnRect.size.height)
+            const bottomDistance = parentAbsoluteRect.size.height - frame.y() - frame.height();
+            returnRect.size.height = (frame.height() / (parentFrame.height() - bottomDistance)) * (parentAbsoluteRect.size.height - bottomDistance);
+            returnRect.origin.y = parentAbsoluteRect.origin.y + (parentAbsoluteRect.size.height - (parentFrame.height() - (frame.y() + frame.height())) - returnRect.size.height);
           }
         } else {
           if ((resizingConstraint & ResizingConstraint.HEIGHT) === ResizingConstraint.HEIGHT) {
-            returnRect.origin.y = parentAbsoluteRect.origin.y + ((((frame.y() + frame.height() / 2.0) / parentFrame.height()) * parentAbsoluteRect.size.height) - (frame.height() / 2.0))
+            returnRect.origin.y = parentAbsoluteRect.origin.y + ((((frame.y() + frame.height() / 2.0) / parentFrame.height()) * parentAbsoluteRect.size.height) - (frame.height() / 2.0));
           } else {
-            returnRect.origin.y = parentAbsoluteRect.origin.y + ((frame.y() / parentFrame.height()) * parentAbsoluteRect.size.height)
-            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.size.height
+            returnRect.origin.y = parentAbsoluteRect.origin.y + ((frame.y() / parentFrame.height()) * parentAbsoluteRect.size.height);
+            returnRect.size.height = (frame.height() / parentFrame.height()) * parentAbsoluteRect.size.height;
           }
         }
       }
