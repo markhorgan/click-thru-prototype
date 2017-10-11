@@ -13,6 +13,7 @@ class Exporter {
   }
 
   hasMobileMenu() {
+    //log("hasMobileMenu()");
     return this.artboardGroups.some(function (artboardGroup) {
       return artboardGroup.some(function (artboardData) {
         return artboardData.mobileMenuLayer != null;
@@ -21,6 +22,7 @@ class Exporter {
   }
 
   generateCSSFile() {
+    //log("generateCSSFile()");
     const fileManager = NSFileManager.defaultManager();
     const path = this._outputPath + "/" + Constants.CSS_DIRECTORY;
     if (!fileManager.fileExistsAtPath(path)) {
@@ -49,6 +51,7 @@ class Exporter {
   }
 
   generateJSFile() {
+    //log("generateJSFile()");
     const fileManager = NSFileManager.defaultManager();
     const jsPath = this._outputPath + "/" + Constants.JS_DIRECTORY;
     const filename = "main.js";
@@ -73,6 +76,7 @@ class Exporter {
   }
 
   getAbsoluteRect(layer, parentAbsoluteRect, indent) {
+    //log("getAbsoluteRect()");
     let x, y, returnRect;
     if (layer.isKindOfClass(MSArtboardGroup)) {
       if (parentAbsoluteRect != null) {
@@ -123,7 +127,7 @@ class Exporter {
               const height = parentAbsoluteRect.size.height - frame.y() - bottomDistance;
               returnRect.size.height = height < 1 ? 1 : height;
             } else if ((resizingConstraint & ResizingConstraint.HEIGHT) !== ResizingConstraint.HEIGHT) {
-              returnRect.size.height = (frame.height() / (parentFrame.height() - frame.y())) * (parentAbsoluteRect.height() - frame.y());
+              returnRect.size.height = (frame.height() / (parentFrame.height() - frame.y())) * (parentAbsoluteRect.size.height - frame.y());
             }
           } else if ((resizingConstraint & ResizingConstraint.BOTTOM) === ResizingConstraint.BOTTOM) {
             if ((resizingConstraint & ResizingConstraint.HEIGHT) === ResizingConstraint.HEIGHT) {
@@ -203,6 +207,7 @@ class Exporter {
   }
 
   getHotspots(layer, excludeMobileMenu, offset, artboardData, parentAbsoluteRect, indent) {
+    //log("getHotspots()");
     const command = this.context.command;
     const isMobileMenu = command.valueForKey_onLayer_forPluginIdentifier(Constants.IS_MOBILE_MENU, layer, this.context.plugin.identifier());
     if ((!layer.isVisible() && !isMobileMenu) || (excludeMobileMenu && isMobileMenu)) {
@@ -283,6 +288,7 @@ class Exporter {
   }
 
   buildHotspotHTML(hotspot) {
+    //log("buildHotspotHTML()");
     const style = "left:" + hotspot.x + "px; top:" + hotspot.y + "px; width:" + hotspot.width + "px; height:" + hotspot.height + "px";
     let html = '<a href="' + hotspot.href + '" class="hotspot" style="' + style + '"';
     if (hotspot.target != null) {
@@ -293,6 +299,7 @@ class Exporter {
   }
 
   buildHotspots(layer, artboardData, indent) {
+    //log("buildHotspots()");
     let html = '';
     const isMobileMenuLayer = !layer.isKindOfClass(MSArtboardGroup);
     const offset = isMobileMenuLayer ? {x: -layer.absoluteRect().rulerX(), y: -layer.absoluteRect().rulerY()} : null;
@@ -306,6 +313,7 @@ class Exporter {
   }
 
   buildEmbeddedCSS(artboardSet) {
+    //log("buildEmbeddedCSS()");
     let html = '<style>\n';
 
     artboardSet.forEach(function (artboardData, index) {
@@ -394,21 +402,25 @@ class Exporter {
   }
 
   getArtboardImageName(artboard, scale) {
+    //log("getArtboardImageName()");
     const suffix = scale == 2 ? "@2x" : "";
     return Utils.toFilename(artboard.name(), false) + suffix + ".png";
   }
 
   getMobileMenuImageName(artboard, scale) {
+    //log("getMobileMenuImageName()");
     const suffix = scale == 2 ? "@2x" : "";
     return Utils.toFilename(artboard.name(), false) + "_mobile_menu" + suffix + ".png";
   }
 
   getCSSName(artboardData, suffix) {
+    //log("getMobileMenuImageName()");
     return artboardData.suffix != null ? artboardData.suffix + "-" + suffix : "main-" + suffix;
   }
 
   // nestedHTML: optional
   buildArtboardHTML(artboardData, nestedHTML) {
+    //log("buildArtboardHTML()");
     const artboard = artboardData.artboard;
     let html = Utils.tab(1) + '<div id="' + this.getCSSName(artboardData, "artboard-container") + '" class="artboard-container">\n' +
         Utils.tab(2) + '<div id="' + this.getCSSName(artboardData, "artboard-image") + '" class="artboard-image"></div>\n' +
@@ -421,6 +433,7 @@ class Exporter {
   }
 
   buildMobileMenuHTML(artboardData, indent) {
+    //log("buildMobileMenuHTML()");
     const mobileMenuLayer = artboardData.mobileMenuLayer;
     if (mobileMenuLayer == null) {
       return null;
@@ -432,12 +445,14 @@ class Exporter {
   }
 
   hasMobileMenuLayer(artboardSet) {
+    //log("hasMobileMenuLayer()");
     return artboardSet.some(function (artboardData) {
       return artboardData.mobileMenuLayer != null;
     });
   }
 
   generateHTMLFile(artboardSet) {
+    //log("generateHTMLFile()");
     const mainArtboard = artboardSet[0].artboard;
     let html = '<!DOCTYPE html>\n<html>\n<head>\n' +
         '<title>' + mainArtboard.name() + '</title>\n' +
@@ -461,6 +476,7 @@ class Exporter {
   }
 
   findLayer(key, layer) {
+    //log("findLayer()");
     const isMobileMenu = !!(this.context.command.valueForKey_onLayer_forPluginIdentifier(key, layer, this.context.plugin.identifier()));
     if (isMobileMenu) {
       return layer;
@@ -480,6 +496,7 @@ class Exporter {
   }
 
   exportImage(layer, scale, imagePath) {
+    //log("exportImage()");
     let slice;
     if (layer.isKindOfClass(MSArtboardGroup)) {
       slice = MSExportRequest.exportRequestsFromExportableLayer(layer).firstObject();
@@ -493,6 +510,7 @@ class Exporter {
   }
 
   exportImages(artboardGroup) {
+    //log("exportImages()");
     artboardGroup.forEach(function (artboardData) {
       const mobileMenuLayer = artboardData.mobileMenuLayer;
       const mobileMenuLayerIsVisible = mobileMenuLayer != null && mobileMenuLayer.isVisible();
@@ -519,6 +537,7 @@ class Exporter {
   }
 
   getArtboardGroups() {
+    //log("getArtboardGroups()");
     const artboardGroups = Utils.getArtboardGroups(this.page.artboards(), this.context);
 
     artboardGroups.forEach(function (artboardGroup) {
@@ -544,7 +563,14 @@ class Exporter {
   }
 
   exportArtboards() {
+    //log("exportArtboards()");
     this.artboardGroups = this.getArtboardGroups();
+
+    /*this.artboardGroups.forEach(function(artboardGroup){
+      artboardGroup.forEach(function (artboardData) {
+        log(`artboard: ${artboardData.artboard.name()}, baseName: ${artboardData.baseName}, suffix: ${artboardData.suffix}`);
+      });
+    });*/
 
     this.generateCSSFile();
     this.generateJSFile();
@@ -556,6 +582,7 @@ class Exporter {
   }
 
   prepareOutputFolder(selectedPath) {
+    //log("prepareOutputFolder()");
     let error;
     const fileManager = NSFileManager.defaultManager();
 
