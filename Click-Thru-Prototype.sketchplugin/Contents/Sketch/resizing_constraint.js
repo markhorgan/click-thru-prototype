@@ -6,4 +6,5 @@ var ResizingConstraint = {
   BOTTOM: 1 << 3,
   HEIGHT: 1 << 4,
   TOP: 1 << 5
-}
+};
+

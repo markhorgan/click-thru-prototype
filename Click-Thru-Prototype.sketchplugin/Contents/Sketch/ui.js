@@ -1,109 +1,104 @@
-var UI = {}
+class UI {
 
-UI.buildLabel = function(text, fontSize, frame) {
-  var label = NSTextField.alloc().initWithFrame(frame)
-  label.setStringValue(text)
-  label.setFont(NSFont.boldSystemFontOfSize(fontSize))
-  label.setBezeled(false)
-  label.setDrawsBackground(false)
-  label.setEditable(false)
-  label.setSelectable(false)
-  return label
-}
-
-UI.buildHint = function(text, fontSize, frame) {
-  var label = NSTextField.alloc().initWithFrame(frame)
-  label.setStringValue(text)
-  label.setFont(NSFont.systemFontOfSize(fontSize))
-  label.setBezeled(false)
-  label.setDrawsBackground(false)
-  label.setEditable(false)
-  label.setSelectable(false)
-  return label
-}
-
-// placeholder: optional
-UI.buildTextField = function(text, frame, placeholder) {
-  var textField = NSTextField.alloc().initWithFrame(frame)
-  textField.setEditable(true)
-  textField.setBordered(true)
-  textField.setStringValue(text)
-  if (placeholder != null) {
-    textField.setPlaceholderString(placeholder)
+  static buildLabel(text, fontSize, frame) {
+    const label = NSTextField.alloc().initWithFrame(frame);
+    label.setStringValue(text);
+    label.setFont(NSFont.boldSystemFontOfSize(fontSize));
+    label.setBezeled(false);
+    label.setDrawsBackground(false);
+    label.setEditable(false);
+    label.setSelectable(false);
+    return label;
   }
-  return textField
-}
 
-UI.buildCheckbox = function(text, checked, frame) {
-  checked = (checked == false) ? NSOffState : NSOnState
-  var checkbox = NSButton.alloc().initWithFrame(frame)
-  checkbox.setButtonType(NSSwitchButton)
-  checkbox.setBezelStyle(0)
-  checkbox.setTitle(text)
-  checkbox.setState(checked)
-  return checkbox
-}
+  static buildHint(text, fontSize, frame) {
+    const label = NSTextField.alloc().initWithFrame(frame);
+    label.setStringValue(text);
+    label.setFont(NSFont.systemFontOfSize(fontSize));
+    label.setBezeled(false);
+    label.setDrawsBackground(false);
+    label.setEditable(false);
+    label.setSelectable(false);
+    return label;
+  }
 
-// horizontal: optional, default: true
-UI.buildRadioButtons = function(labels, selectedIndex, frame, isHorizontal) {
-  if (isHorizontal == null) {
-    isHorizontal = true
-  }
-  var buttonCell = NSButtonCell.new()
-  buttonCell.setButtonType(NSRadioButton)
-  if (isHorizontal) {
-    var numRows = 1
-    var numCols = labels.length
-  } else {
-    var numRows = labels.length
-    var numCols = 1
-  }
-  var matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(frame, NSRadioModeMatrix, buttonCell, numRows, numCols)
-  matrix.setAutorecalculatesCellSize(true)
-  var cells = matrix.cells()
-  for (var i = 0; i < labels.length; i++) {
-    cells[i].setTitle(labels[i])
-  }
-  if (selectedIndex != null) {
-    if (isHorizontal)   {
-      matrix.selectCellAtRow_column(0, selectedIndex)
-    } else {
-      matrix.selectCellAtRow_column(selectedIndex, 0)
+  static buildTextField(text, frame, placeholder = null) {
+    const textField = NSTextField.alloc().initWithFrame(frame);
+    textField.setEditable(true);
+    textField.setBordered(true);
+    textField.setStringValue(text);
+    if (placeholder != null) {
+      textField.setPlaceholderString(placeholder);
     }
+    return textField;
   }
-  return matrix
-}
 
-// selectedIndex: optional
-UI.buildComboBox = function(frame, values, selectedIndex) {
-  var comboBox = NSComboBox.alloc().initWithFrame(frame)
-  comboBox.addItemsWithObjectValues(values)
-  if (selectedIndex != null) {
-    comboBox.selectItemAtIndex(selectedIndex)
-  }  
-  return comboBox
-}
-
-// title: optional, default: "Notice"
-UI.displayDialog = function(text, title) {
-  if (title == null) {
-    title = "Notice"
+  static buildCheckbox(text, checked, frame) {
+    checked = (checked == false) ? NSOffState : NSOnState;
+    const checkbox = NSButton.alloc().initWithFrame(frame);
+    checkbox.setButtonType(NSSwitchButton);
+    checkbox.setBezelStyle(0);
+    checkbox.setTitle(text);
+    checkbox.setState(checked);
+    return checkbox;
   }
-  NSApplication.sharedApplication().displayDialog_withTitle(text, title)
-}
 
-UI.saveFileDialog = function() {
-  var openPanel = NSOpenPanel.openPanel()
-  openPanel.setTitle("Chooce a location...")
-  openPanel.setPrompt("Export")
-  openPanel.setCanChooseDirectories(true)
-  openPanel.setCanChooseFiles(false)
-  openPanel.setAllowsMultipleSelection(false)
-  openPanel.setShowsHiddenFiles(false)
-  openPanel.setExtensionHidden(false)
-  var buttonPressed = openPanel.runModal()
-  if (buttonPressed == NSFileHandlingPanelOKButton) {
-    return openPanel.URL()
+  static buildRadioButtons(labels, selectedIndex, frame, isHorizontal = true) {
+    if (isHorizontal == null) {
+      isHorizontal = true;
+    }
+    const buttonCell = NSButtonCell.new();
+    buttonCell.setButtonType(NSRadioButton);
+    let numRows, numCols;
+    if (isHorizontal) {
+      numRows = 1;
+      numCols = labels.length;
+    } else {
+      numRows = labels.length;
+      numCols = 1;
+    }
+    const matrix = NSMatrix.alloc().initWithFrame_mode_prototype_numberOfRows_numberOfColumns(frame, NSRadioModeMatrix, buttonCell, numRows, numCols);
+    matrix.setAutorecalculatesCellSize(true);
+    const cells = matrix.cells();
+    for (let i = 0; i < labels.length; i++) {
+      cells[i].setTitle(labels[i]);
+    }
+    if (selectedIndex != null) {
+      if (isHorizontal) {
+        matrix.selectCellAtRow_column(0, selectedIndex);
+      } else {
+        matrix.selectCellAtRow_column(selectedIndex, 0);
+      }
+    }
+    return matrix;
   }
-  return null
+
+  static buildComboBox(frame, values, selectedIndex = null) {
+    const comboBox = NSComboBox.alloc().initWithFrame(frame);
+    comboBox.addItemsWithObjectValues(values);
+    if (selectedIndex != null) {
+      comboBox.selectItemAtIndex(selectedIndex);
+    }
+    return comboBox;
+  }
+
+  static displayDialog(text, title = "Notice") {
+    NSApplication.sharedApplication().displayDialog_withTitle(text, title);
+  }
+
+  static saveFileDialog() {
+    const openPanel = NSOpenPanel.openPanel();
+    openPanel.setTitle("Chooce a location...");
+    openPanel.setPrompt("Export");
+    openPanel.setCanChooseDirectories(true);
+    openPanel.setCanChooseFiles(false);
+    openPanel.setAllowsMultipleSelection(false);
+    openPanel.setShowsHiddenFiles(false);
+    openPanel.setExtensionHidden(false);
+    const buttonPressed = openPanel.runModal();
+    if (buttonPressed == NSFileHandlingPanelOKButton) {
+      return openPanel.URL();
+    }
+    return null;
+  }
 }

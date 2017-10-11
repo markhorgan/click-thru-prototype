@@ -3,15 +3,15 @@
     <channel>
         <title>Click-Thru Prototype</title>
         <link>https://raw.githubusercontent.com/markhorgan/click-thru-prototype/master/appcast.xml</link>
-        <description>Create click-through prototypes within Sketch</description>
+        <description>Generates a HTML clickable prototype of your responsive website design</description>
         <language>en</language>
         <item>
             <title>Version 1.1.6</title>
             <description>
                 <![CDATA[
-                    <ul>
-                        <li>Fixed an issue with resizing constraints</li>
-                    </ul>
+                   <ul>
+                    <li>Fixed an issue with resizing constraints</li>
+                   </ul>
                 ]]>
             </description>
             <enclosure url="https://github.com/markhorgan/click-thru-prototype/archive/master.zip" sparkle:version="1.1.6"/>

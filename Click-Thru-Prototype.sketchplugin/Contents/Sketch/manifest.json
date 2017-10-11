@@ -1,9 +1,8 @@
 {
   "name": "Click-Thru Prototype",
-  "description": "Generates a HTML click-through prototype of your responsive website design",
+  "description": "Generates a HTML clickable prototype of your responsive website design",
   "author" : "Mark Horgan",
   "homepage": "https://github.com/markhorgan/click-thru-prototype",
-  "updateURL": "https://github.com/markhorgan/click-thru-prototype/archive/master.zip",
   "appcast": "https://raw.githubusercontent.com/markhorgan/click-thru-prototype/master/appcast.xml",
   "identifier" : "com.markhorgan.sketch.clickThruPrototype",
   "compatibleVersion": 3,
@@ -19,13 +18,13 @@
     {
       "script" : "external_link.js",
       "handler" : "onRun",
-      "name" : "Add External Link",
+      "name" : "External Link",
       "identifier" : "externalLink"
     },
     {
       "script": "java_script_dialog.js",
       "handler": "onRun",
-      "name": "Add JavaScript Dialog",
+      "name": "JavaScript Dialog",
       "identifier": "javaScriptDialog"
     },
     {

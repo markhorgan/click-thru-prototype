@@ -16,15 +16,10 @@ var Constants = {
   OUTPUT_DIRECTORY: "prototype",
   IMAGES_DIRECTORY: "images/",
   CSS_DIRECTORY: "css/",
-  JS_DIRECTORY: "js/"
-}
+  JS_DIRECTORY: "js/",
+  PLUGIN_IDENTIFIER: "com.markhorgan.sketch.clickThruPrototype"
+};
 
 Constants.KEYS = [Constants.ARTBOARD_LINK, Constants.EXTERNAL_LINK, Constants.OPEN_LINK_IN_NEW_WINDOW,
-  Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE, Constants.DIALOG_TEXT]
+  Constants.IS_MOBILE_MENU_BUTTON, Constants.IS_MOBILE_MENU, Constants.DIALOG_TYPE, Constants.DIALOG_TEXT];
 
-var ResizingType = {
-  STRETCH: 0,
-  PIN_TO_CORNER: 1,
-  RESIZE_OBJECT: 2,
-  FLOAT_IN_PLACE: 3
-}
