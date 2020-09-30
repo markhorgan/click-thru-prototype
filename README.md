@@ -10,7 +10,7 @@ To install, [download the zip file](https://github.com/markhorgan/click-thru-pro
 
 ## Usage
 
-You can create links between artboards, add external links or show a JavaScript dialog. When you're finished adding these you can generate a HTML website of the current page by selecting `Export to HTML`. The generated files can then be uploaded to a server so you can show your client. 
+ You can create links between artboards, add external links, or show a JavaScript dialog. When you're finished adding these you can generate an HTML website, of the current page by selecting `Export to HTML`. The generated files can then be uploaded to a server so you can show your client.
  
 ### Responsive Design 
  
